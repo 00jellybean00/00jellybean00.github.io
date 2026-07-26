@@ -21,13 +21,22 @@ python3 -m http.server 8000
 # http://localhost:8000/slides/demo/  견본 발표자료
 ```
 
+## 주소 뒤에 붙이는 표시
+
+| 표시 | 효과 |
+|---|---|
+| `?light` | 조명이 밝은 강의실용 밝은 화면. 별과 성운을 끈다 |
+| `?print-pdf` | PDF 인쇄용 배치. 별을 끄고 단색 배경만 남긴다 |
+| `?receiver` | reveal이 발표자 화면에서 자동으로 붙인다. 무거운 그리기를 건너뛴다 |
+
 ## 자체 검사
 
 ```bash
-node assets/starfield.selftest.js
+node assets/starfield.selftest.js   # 별 개수·밝기·이동폭 상한, 애니메이션 루프 수명
+node .github/check-links.js         # 배포에서만 깨지는 경로, 문서 공개 차단
 ```
 
-별 개수·최대 밝기·마우스 이동폭 상한이 약속대로인지 확인한다.
+푸시하면 GitHub Actions가 같은 검사를 자동으로 돌린다(`.github/workflows/check.yml`).
 
 ## 발표자료 추가하기
 

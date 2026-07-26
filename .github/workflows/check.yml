@@ -1,0 +1,33 @@
+# 이 저장소에는 자동 검사가 없어서, 사람이 안 돌리면 그대로 배포되던 문제가 있었다.
+# 여기서 두 가지를 막는다.
+#   1) 별 애니메이션의 수치 약속과 루프 수명이 깨지는 것
+#   2) 내 컴퓨터에서는 되고 웹에 올리면 404가 나는 경로
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # 서브모듈은 검사에 필요 없다. 기본값(미체크아웃) 그대로 둔다.
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 문법 검사
+        run: |
+          node --check assets/starfield.js
+          node --check assets/starfield.selftest.js
+          node --check .github/check-links.js
+
+      - name: 별 애니메이션 자체 검사
+        run: node assets/starfield.selftest.js
+
+      - name: 링크·배포 검사
+        run: node .github/check-links.js

@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>견본 발표자료</title>
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <!-- 밝은 강의실 모드. 화면이 그려지기 전에 정해야 어두운 화면이 잠깐 스치지 않는다. -->
+  <script>if(new URLSearchParams(location.search).has('light'))document.documentElement.classList.add('light')</script>
 
   <link rel="stylesheet" href="../vendor/reveal/reset.css">
   <link rel="stylesheet" href="../vendor/reveal/reveal.css">
@@ -191,7 +194,8 @@ flowchart LR
         <b>S</b> — 발표자 화면 (노트 + 다음 슬라이드)<br>
         <b>F</b> — 전체 화면 &nbsp;·&nbsp; <b>ESC</b> — 전체 슬라이드 보기<br>
         <b>B</b> — 화면 잠시 검게 &nbsp;·&nbsp; <b>?</b> — 단축키 목록<br>
-        주소 끝에 <b>?print-pdf</b> — PDF로 인쇄
+        주소 끝에 <b>?print-pdf</b> — PDF로 인쇄<br>
+        주소 끝에 <b>?light</b> — 조명이 밝은 강의실용 화면
       </p>
     </section>
 

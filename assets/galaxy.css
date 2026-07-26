@@ -13,6 +13,26 @@
   --g-scrim: rgba(10, 14, 26, 0.55);
 }
 
+/* 밝은 강의실용 화면 (unknowns 미해소 2번).
+   주소 끝에 ?light 를 붙이면 켜진다. 조명이 밝거나 프로젝터가 어두운 곳에서
+   어두운 화면은 글자가 안 보인다. 그때 현장에서 주소만 고쳐 대응한다.
+   이 모드는 장식이 아니라 판독이 목적이므로 별과 성운을 끈다.
+   대비비는 어두운 모드와 같은 기준을 맞췄다 — 전부 WCAG AAA(7:1) 이상.
+   본문 15.7:1 · 보조 7.8:1 · 강조 7.4:1 · 링크 8.2:1 */
+:root.light {
+  --g-bg: #f4f6fb;
+  --g-surface: #ffffff;
+  --g-text: #171c29;
+  --g-muted: #454d5f;
+  --g-accent: #704900;
+  --g-link: #1a3fae;
+  --g-border: rgba(23, 28, 41, 0.16);
+  --g-scrim: rgba(244, 246, 251, 0.62);
+}
+
+:root.light { background-image: none; }
+:root.light #starfield { display: none; }
+
 /* 성운(nebula)은 html 배경에 직접 얹는다. opacity가 낮아 눈에 띄지 않는다.
    별 캔버스보다 뒤에 있어야 하므로 가상 요소 대신 배경 이미지로 둔다. */
 html {

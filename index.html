@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>발표자료</title>
   <meta name="description" content="발표자료 목록">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <!-- 밝은 강의실 모드. 화면이 그려지기 전에 정해야 어두운 화면이 잠깐 스치지 않는다. -->
+  <script>if(new URLSearchParams(location.search).has('light'))document.documentElement.classList.add('light')</script>
   <link rel="stylesheet" href="assets/galaxy.css">
 </head>
 <body>
@@ -33,6 +36,10 @@
       <p>
         방향키 또는 스페이스로 넘기고, <kbd>S</kbd>로 발표자 화면, <kbd>F</kbd>로 전체 화면,
         <kbd>ESC</kbd>로 전체 슬라이드 보기.
+      </p>
+      <p>
+        조명이 밝은 강의실이라 화면이 잘 안 보이면, 주소 끝에
+        <kbd>?light</kbd>를 붙이세요. 밝은 배경으로 바뀝니다.
       </p>
     </footer>
   </main>

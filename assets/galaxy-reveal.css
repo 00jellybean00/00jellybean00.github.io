@@ -72,6 +72,22 @@
 }
 .reveal .slides section.hero .tagline { color: var(--g-muted); font-size: 0.7em; }
 
+/* 밝은 화면에서는 그라디언트 글자가 흐려 보인다. 단색으로 되돌린다. */
+:root.light .reveal .slides section.hero h1 {
+  background: none;
+  color: var(--g-text);
+}
+
+/* 코드·다이어그램·그래프 상자는 밝은 화면에서도 어두운 채로 둔다.
+   반투명으로 두면 밝은 배경이 비쳐 회색이 되고, 그 안의 선과 글자가 안 보인다.
+   그래서 여기서는 불투명한 색을 쓴다. */
+:root.light .reveal pre,
+:root.light .reveal .figure {
+  background: #111827;
+  border-color: rgba(232, 234, 240, 0.18);
+}
+:root.light .reveal .figure .cite { color: var(--g-muted); }
+
 /* 코드 블록 */
 .reveal pre {
   width: 100%;
@@ -105,7 +121,10 @@
 .reveal .katex { color: var(--g-text); }
 .reveal .katex-display { margin: 0.8em 0; }
 
-/* 다이어그램·그래프를 담는 상자 */
+/* 다이어그램·그래프를 담는 상자.
+   밝은 강의실 모드에서도 이 상자와 코드 블록은 어두운 채로 둔다.
+   다이어그램과 그래프의 색은 자바스크립트에서 어두운 배경 기준으로 정하므로,
+   상자까지 밝게 바꾸면 그 안의 선과 글자가 안 보인다. */
 .reveal .figure {
   padding: 1rem;
   border: 1px solid var(--g-border);
