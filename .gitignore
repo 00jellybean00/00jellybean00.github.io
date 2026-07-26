@@ -1,0 +1,9 @@
+# Jekyll 로컬 빌드 결과
+_site/
+.jekyll-cache/
+
+# 브라우저 확인 도구가 남기는 파일
+.playwright-mcp/
+
+# 패키지 매니저 (지금은 안 쓰지만, 실수로 커밋되면 배포가 깨진다)
+node_modules/

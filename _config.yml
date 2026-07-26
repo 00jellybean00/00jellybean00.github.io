@@ -1,0 +1,24 @@
+# GitHub Pages(Jekyll) 설정.
+#
+# exclude는 기본 목록을 "대체"한다 — 덧붙이는 게 아니다.
+# 그래서 Jekyll 기본값(Gemfile, node_modules, vendor/*)을 여기에 다시 적어야 한다.
+# 근거: docs/blindspot/2026-07-27-revealjs-galaxy-slides-unknowns.md 해소 7번
+#
+# docs/ 를 빼는 이유: 작업 문서가 웹 주소로 공개되지 않게 하려고.
+# .claude/ 는 점으로 시작해서 Jekyll이 자동으로 제외한다.
+
+exclude:
+  - docs
+  - CLAUDE.md
+  - slides/README.md
+  - Gemfile
+  - Gemfile.lock
+  - gemfiles
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# slides/vendor/ 는 위 vendor/* 규칙(저장소 최상위 기준)에 걸리지 않는다.
+# 발표자료가 쓰는 라이브러리이므로 그대로 배포되어야 한다.

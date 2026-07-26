@@ -1,0 +1,146 @@
+/* 갤럭시 공통 팔레트 — 랜딩과 발표자료가 함께 쓴다.
+   색값 근거: docs/blindspot/2026-07-27-revealjs-galaxy-slides-unknowns.md 해소 12번
+   #0a0e1a 위 #e8eaf0 = 대비비 약 16:1 (WCAG AAA 기준 7:1) */
+:root {
+  --g-bg: #0a0e1a;
+  --g-surface: #111827;
+  --g-text: #e8eaf0;
+  --g-muted: #9ca3b4;
+  --g-accent: #d4a843;
+  --g-link: #60a5fa;
+  --g-border: rgba(232, 234, 240, 0.12);
+  /* 글자 뒤 어둠 막 — 별 위에서도 대비가 유지되게 한다 (해소 20번) */
+  --g-scrim: rgba(10, 14, 26, 0.55);
+}
+
+/* 성운(nebula)은 html 배경에 직접 얹는다. opacity가 낮아 눈에 띄지 않는다.
+   별 캔버스보다 뒤에 있어야 하므로 가상 요소 대신 배경 이미지로 둔다. */
+html {
+  background-color: var(--g-bg);
+  background-image:
+    radial-gradient(60% 45% at 22% 18%, rgba(96, 165, 250, 0.07), transparent 70%),
+    radial-gradient(50% 40% at 80% 75%, rgba(168, 116, 220, 0.06), transparent 70%),
+    radial-gradient(45% 35% at 65% 25%, rgba(212, 168, 67, 0.035), transparent 70%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+body {
+  background: transparent;
+  color: var(--g-text);
+  margin: 0;
+}
+
+/* 별 캔버스는 항상 맨 뒤. 클릭을 가로채지 않는다. */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* 인쇄(PDF 내보내기)에서는 움직이는 별과 성운을 끄고 단색만 남긴다 (해소 17번) */
+@media print {
+  #starfield { display: none !important; }
+  html {
+    background-image: none !important;
+    background-color: var(--g-bg) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* ── 랜딩 페이지 ─────────────────────────────────────────── */
+
+.landing {
+  position: relative;
+  z-index: 1;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: clamp(3rem, 10vh, 7rem) 1.5rem 4rem;
+  font-family: -apple-system, "Pretendard", "Apple SD Gothic Neo",
+               "Noto Sans KR", "Malgun Gothic", sans-serif;
+  line-height: 1.6;
+}
+
+.landing header { margin-bottom: clamp(2.5rem, 7vh, 4.5rem); }
+
+.landing h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.landing .tagline { margin: 0; color: var(--g-muted); font-size: 1.05rem; }
+
+.deck-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+}
+
+.deck-card {
+  display: block;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  border: 1px solid var(--g-border);
+  border-radius: 0.75rem;
+  background: var(--g-scrim);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.25s, transform 0.25s, background 0.25s;
+}
+
+.deck-card:hover,
+.deck-card:focus-visible {
+  border-color: var(--g-accent);
+  background: rgba(17, 24, 39, 0.75);
+  transform: translateY(-2px);
+}
+
+.deck-card:focus-visible { outline: 2px solid var(--g-link); outline-offset: 3px; }
+
+.deck-card h2 { margin: 0 0 0.4rem; font-size: 1.2rem; font-weight: 600; }
+.deck-card p { margin: 0 0 1rem; color: var(--g-muted); font-size: 0.92rem; }
+
+.deck-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--g-muted);
+}
+
+.deck-meta span {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--g-border);
+  border-radius: 999px;
+}
+
+.landing footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--g-border);
+  color: var(--g-muted);
+  font-size: 0.85rem;
+}
+
+.landing footer a { color: var(--g-link); }
+.landing kbd {
+  padding: 0.05em 0.4em;
+  border: 1px solid var(--g-border);
+  border-radius: 0.25rem;
+  background: var(--g-surface);
+  font-size: 0.9em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-card { transition: none; }
+  .deck-card:hover, .deck-card:focus-visible { transform: none; }
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>발표자료</title>
+  <meta name="description" content="발표자료 목록">
+  <link rel="stylesheet" href="assets/galaxy.css">
+</head>
+<body>
+  <main class="landing">
+    <header>
+      <h1>발표자료</h1>
+      <p class="tagline">보고 싶은 발표자료를 골라 주세요.</p>
+    </header>
+
+    <!-- 발표자료가 늘어나면 아래에 <li>를 하나 더 붙인다.
+         목록이 길어지면 그때 데이터 파일로 분리한다. -->
+    <ul class="deck-list">
+      <li>
+        <a class="deck-card" href="slides/demo/">
+          <h2>견본 발표자료</h2>
+          <p>수식, 코드, 다이어그램, 그래프가 어떻게 보이는지 확인하는 견본입니다.</p>
+          <div class="deck-meta">
+            <span>2026-07-27</span>
+            <span>슬라이드 12장</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <footer>
+      <p>
+        방향키 또는 스페이스로 넘기고, <kbd>S</kbd>로 발표자 화면, <kbd>F</kbd>로 전체 화면,
+        <kbd>ESC</kbd>로 전체 슬라이드 보기.
+      </p>
+    </footer>
+  </main>
+
+  <script src="assets/starfield.js"></script>
+</body>
+</html>
