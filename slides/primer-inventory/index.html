@@ -15,21 +15,256 @@
   <!-- 갤럭시 색은 반드시 기본 테마 뒤에 온다 -->
   <link rel="stylesheet" href="../../assets/galaxy.css">
   <link rel="stylesheet" href="../../assets/galaxy-reveal.css">
+
+  <!-- ================================================================
+       이 덱 전용 스타일. 공용 파일(galaxy*.css, starfield.js)은 건드리지 않는다.
+       고치면 첫 화면과 견본 덱까지 바뀌기 때문이다.
+       색과 움직임은 euiyun.com 세미나 덱을 참고했다.
+       ================================================================ -->
+  <style>
+  /* --- 팔레트 -----------------------------------------------------
+     :root.light 는 특정성이 (0,2,0)이라 :root (0,1,0)를 순서와 무관하게 이긴다.
+     그래서 두 벌을 반드시 쌍으로 쓴다. 한쪽만 쓰면 ?light 에서 새 색이 통째로 증발한다. */
+  :root {
+    --g-bg:      #06080F;   /* 참고 덱 bg-0 */
+    --g-surface: #0E1220;   /* 참고 덱 bg-1 */
+    --g-text:    #E2E6F0;   /* 참고 덱 fg-dim — 순백은 눈이 부셔 한 단계 낮춘다 */
+    --g-muted:   #B8BFD0;   /* 참고 덱 fg-soft */
+    --g-accent:  #9B82FF;   /* 보라 */
+    --g-link:    #2BEAD0;   /* 민트 */
+    --g-border:  rgba(155, 130, 255, 0.28);
+    --g-scrim:   rgba(6, 8, 15, 0.55);
+
+    --d-bg-2:    #161B30;   /* 참고 덱 bg-2 — 상자 배경용 */
+    --d-pink:    #FF7A95;
+    --d-amber:   #FFD46B;
+  }
+  :root.light {
+    --g-accent:  #4213FF;   /* 보라의 어두운 변종 — 밝은 배경에서 7.01:1 */
+    --g-link:    #095F53;   /* 민트의 어두운 변종 — 7.00:1 */
+    --g-border:  rgba(66, 19, 255, 0.22);
+
+    --d-pink:    #AB0023;   /* 7.05:1 */
+    --d-amber:   #6E4E00;   /* 7.06:1 */
+  }
+
+  /* --- reveal 변수 -------------------------------------------------
+     --r-* 중 15개는 galaxy-reveal.css 가 .reveal 에 재선언했다.
+     변수는 상속 근접성으로 풀리므로 그 15개는 반드시 .reveal 에 써야 한다.
+     --r-main-font-size 는 재선언되지 않아 :root 에서 먹는다. */
+  :root {
+    /* 화면 세로가 700에서 800으로 커지면 확대 배율이 0.875배가 된다.
+       42 / 0.875 = 48. 기준 글자를 함께 올려야 화면 위 크기가 그대로다. */
+    --r-main-font-size: 48px;
+  }
+  .reveal {
+    --r-heading1-size: 2.6em;
+    --r-heading2-size: 1.5em;
+  }
+
+  /* 참고 덱은 제목 굵기 800, 자간 -0.02em.
+     galaxy-reveal.css 가 font-weight:700 을 못 박아 변수로는 안 바뀐다. */
+  .reveal h1, .reveal h2, .reveal h3 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .reveal h1 { color: var(--g-text); }
+  .reveal h3 { color: var(--g-link); }        /* 민트 */
+  .reveal table th { color: var(--g-accent); } /* 보라 */
+  .reveal strong { color: var(--d-amber); }    /* 호박 */
+
+  /* hero 제목 그라디언트를 보라에서 민트로 */
+  .reveal .slides section.hero h1 {
+    background: linear-gradient(100deg, var(--g-accent), var(--g-link) 55%, var(--d-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  :root.light .reveal .slides section.hero h1 {
+    background: none;
+    color: var(--g-accent);
+  }
+
+  /* --- 원문 상자 ---------------------------------------------------
+     공용 파일의 max-height:480px 를 없앤다. 새 크기에서 상자 셋이 그 값을 넘는다.
+     이제 슬라이드 세로 800이 유일한 상한이다. */
+  .reveal pre code { max-height: none; }
+  .reveal pre {
+    background: rgba(6, 8, 15, 0.72);
+    border-color: var(--g-border);
+  }
+  :root.light .reveal pre {
+    background: var(--d-bg-2);
+    border-color: rgba(155, 130, 255, 0.32);
+  }
+  .reveal code:not(pre code) {
+    background: rgba(155, 130, 255, 0.16);
+  }
+  :root.light .reveal code:not(pre code) {
+    background: rgba(66, 19, 255, 0.10);
+  }
+
+  /* --- 코드 구문 색 -------------------------------------------------
+     monokai 의 라임·카키는 새 팔레트와 겉돈다.
+     특히 주석 #75715e 는 밝은 모드의 어두운 상자 위에서 3.62:1 로 AA 미달이다.
+
+     주의: 여기서는 팔레트 변수를 쓰면 안 된다.
+     밝은 모드에서 변수는 밝은 배경용 어두운 값으로 바뀌는데,
+     코드 상자 배경은 밝은 모드에서도 어두운 채로 남기 때문이다.
+     어두운 글자에 어두운 배경이 되어 선명도가 2.2까지 떨어진다.
+     그래서 상자 배경에 맞춘 밝은 값을 직접 적는다. */
+  .reveal .hljs-keyword,
+  .reveal .hljs-selector-tag,
+  .reveal .hljs-built_in    { color: #9B82FF; }   /* 보라 */
+  .reveal .hljs-string,
+  .reveal .hljs-attr        { color: #2BEAD0; }   /* 민트 */
+  .reveal .hljs-number,
+  .reveal .hljs-literal     { color: #FFD46B; }   /* 호박 */
+  .reveal .hljs-title,
+  .reveal .hljs-function    { color: #FF7A95; }   /* 분홍 */
+  .reveal .hljs-comment     { color: #A8B0C4; font-style: italic; }
+  .reveal pre code          { color: #E2E6F0; }   /* 상자 안 기본 글자도 고정 */
+
+  /* 인라인 코드 칩은 상자 밖이라 배경이 모드에 따라 바뀐다.
+     어두운 모드는 밝은 민트, 밝은 모드는 어두운 민트를 쓴다. */
+  .reveal code:not(pre code)          { color: #2BEAD0; }
+  :root.light .reveal code:not(pre code) { color: #095F53; }
+
+  /* --- 배경 두 겹 ---------------------------------------------------
+     별 배경(starfield)은 그대로 두고 그 위에 얹는다.
+     밝은 모드에서는 별과 함께 이 두 겹도 꺼진다. */
+  .deck-bg-glow,
+  .deck-bg-grid {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .deck-bg-glow {
+    background:
+      radial-gradient(circle at 15% 20%, rgba(155, 130, 255, 0.13), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(43, 234, 208, 0.10), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(255, 122, 149, 0.04), transparent 60%);
+    animation: deckDrift 18s ease-in-out infinite alternate;
+  }
+  @keyframes deckDrift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-2%, 2%) scale(1.05); }
+  }
+  .deck-bg-grid {
+    background-image:
+      linear-gradient(rgba(155, 130, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(155, 130, 255, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85), transparent 75%);
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85), transparent 75%);
+  }
+  :root.light .deck-bg-glow,
+  :root.light .deck-bg-grid { display: none; }
+  .reveal { position: relative; z-index: 1; }
+
+  /* --- 자동 등장 -----------------------------------------------------
+     핵심: 처음 모습(opacity:0)을 @keyframes 의 from 에만 두고 fill-mode 를 backwards 로 준다.
+     기본 규칙에 opacity:0 을 두면 애니메이션이 안 걸리는 세 곳에서 내용이 영원히 사라진다.
+     그 셋은 전체 보기(ESC), 인쇄(?print-pdf), 움직임 줄이기 설정이다.
+     이 방식이면 예외를 따로 뚫지 않아도 그 셋에서 자연히 보인다.
+
+     :not(.stack) — 부록이 달린 슬라이드는 부모 껍데기에도 .present 가 붙는다.
+                    안 빼면 부록 슬라이드가 통째로 밀려 올라온다.
+     :not(pre .rise) — 코드 줄 강조도 같은 fragment 로 만들어진다.
+                    규칙에 걸리면 5~6단계가 겹쳐 찍혀 강조 기능이 사라진다.
+
+     지연은 변수(--step, --lead)로만 조절한다. 지연값을 다른 규칙에 적으면 안 된다.
+     아래 선택자는 특정성이 높은 데다 animation 단축 속성이
+     생략된 animation-delay 를 0 으로 되돌리기 때문이다.
+     변수는 이 규칙이 건드리지 않으므로 낮은 특정성에서도 그대로 전달된다. */
+  @keyframes deckRise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .reveal .slides section.present:not(.stack) .rise:not(pre .rise) {
+    animation: deckRise 0.6s ease backwards;
+    animation-delay: calc(var(--i, 0) * var(--step, 0.15s) + var(--lead, 0.05s));
+  }
+  /* 등장 순서는 요소에 직접 적는다(--i).
+     형제 순서(nth-child)를 세는 방식은 함정이 셋이다.
+     첫째, .rise 가 아닌 형제까지 센다. 제목이 있으면 순서가 한 칸 밀린다.
+     둘째, 감싸는 상자 안에서 1부터 다시 센다.
+     셋째, 단계 수를 미리 정해 둬야 하고 그 수를 넘으면 조용히 한꺼번에 나온다.
+     순서를 직접 적으면 셋 다 없어지고 단계 수 제한도 사라진다.
+
+     순서가 곧 논지인 다섯 장은 간격만 바꾼다.
+     항목이 여럿이면 간격을 0.15초에서 0.5초로 넓힌다.
+     항목이 하나뿐이면 나타나기까지 1.2초를 기다린다. */
+  section.slow-steps .rise { --step: 0.5s; --lead: 0.1s; }
+  section.slow-one   .rise { --step: 0s;   --lead: 1.2s; }
+
+  /* 발표자 화면과 인쇄에서는 끈다.
+     발표자가 다음 내용을 확인하려는 순간 빈 화면부터 다시 보면 안 된다. */
+  html.deck-no-anim .rise,
+  html.reveal-print .rise,
+  html.print-pdf .rise { animation: none !important; }
+
+  /* 인쇄는 @media print 가 아니라 클래스로 들어온다. 두 경로를 모두 막는다. */
+  html.reveal-print .deck-bg-glow, html.reveal-print .deck-bg-grid,
+  html.print-pdf .deck-bg-glow,    html.print-pdf .deck-bg-grid { display: none; }
+
+  /* 인쇄에서는 reveal 이 슬라이드에 위아래 60씩 여백을 강제로 붙인다.
+     화면에서 딱 맞춘 코드 슬라이드가 그 120 때문에 페이지를 넘긴다.
+     가로 여백도 폭을 화면보다 좁게 만들어 원문이 잘린다.
+     이 덱은 화면 기준으로 크기를 맞췄으므로 인쇄 여백을 걷어낸다.
+     원문 상자 자체가 안쪽 여백을 갖고 있어 글자가 가장자리에 붙지 않는다.
+     세로 위치도 다시 잡는다. reveal은 인쇄 페이지를 만들 때 높이를 한 번만 재는데,
+     글꼴이 다 실리기 전 값이라 실제보다 작게 나와 슬라이드가 아래로 밀린다.
+     실제 높이 기준으로 가운데 맞추도록 바꾼다. */
+  html.reveal-print .reveal .slides section,
+  html.print-pdf .reveal .slides section {
+    padding: 8px 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+  /* 부록이 달린 슬라이드의 부모 껍데기(.stack)는 빼야 한다.
+     껍데기는 내용이 없는데 위 여백 때문에 높이 16이 생긴다.
+     게다가 reveal 이 껍데기에는 top 을 안 주므로 50% 가 전체 목록 높이 기준으로 풀린다.
+     그 둘 때문에 인쇄물 맨 뒤에 빈 페이지가 한 장 붙는다. */
+  html.reveal-print .reveal .slides section.stack,
+  html.print-pdf .reveal .slides section.stack {
+    padding: 0 !important;
+    top: auto !important;
+    transform: none !important;
+  }
+
+  @media print {
+    .rise { animation: none !important; }
+    .deck-bg-glow, .deck-bg-grid { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise { animation: none !important; }
+    .deck-bg-glow { animation: none; }
+  }
+  </style>
 </head>
 <body>
+<!-- 별 배경 위에 얹는 두 겹. 색 얼룩과 옅은 격자다. -->
+<div class="deck-bg-glow" aria-hidden="true"></div>
+<div class="deck-bg-grid" aria-hidden="true"></div>
 <div class="reveal">
   <div class="slides">
 
     <!-- ============ 1부. 무엇을 푸는가 (3장) ============ -->
 
     <!-- 1 -->
-    <section class="hero" data-auto-animate>
+    <section class="hero">
       <h1>primer-inventory</h1>
       <p class="tagline">랩이 이미 가진 primer 중에서 시퀀싱에 쓸 것을 골라 주는 도구</p>
       <p class="muted" style="font-size: 0.5em">2026-07-27 · 저장 시점 e4af260 기준</p>
       <aside class="notes">
-        오늘은 세 가지를 말씀드립니다. 무엇을 만들었는지, 무엇으로 판정하는지, 아직 못 미더운 것이 무엇인지입니다.
-        마지막에 네 가지를 여쭙겠습니다. 판정 기준, 다음 우선순위, 프로젝트 범위, 랩 운영 연결입니다.
+        <b>세 가지 말씀드리고 네 가지 여쭙니다</b><br>
+        · 만든 것 · 판정 기준 · 못 미더운 것<br>
+        · 여쭐 것 넷은 맨 뒤에<br>
+        · 기준 시점은 오늘 오전 저장분<br>
+        <br>
+        먼저 지금 어떻게 하시는지부터.
       </aside>
     </section>
 
@@ -37,15 +272,19 @@
     <section>
       <h2>지금은 매번 손으로 찾습니다</h2>
       <ul>
-        <li class="fragment">확인할 구간이 생기면 보관 중인 primer 목록을 하나씩 훑습니다</li>
-        <li class="fragment">각 primer가 그 근처에 붙는지, 어느 방향인지 눈으로 확인합니다</li>
-        <li class="fragment">몇 개를 보내야 구간이 다 읽히는지는 종이에 그려 가며 셉니다</li>
-        <li class="fragment">primer가 수십 개가 되면 이 일이 오래 걸립니다</li>
+        <li class="rise" style="--i:0">확인할 구간이 생기면 보관 중인 primer 목록을 하나씩 훑습니다</li>
+        <li class="rise" style="--i:1">각 primer가 그 근처에 붙는지, 어느 방향인지 눈으로 확인합니다</li>
+        <li class="rise" style="--i:2">몇 개를 보내야 구간이 다 읽히는지는 종이에 그려 가며 셉니다</li>
+        <li class="rise" style="--i:3">primer가 수십 개가 되면 이 일이 오래 걸립니다</li>
       </ul>
       <p class="muted" style="font-size: 0.55em">그리고 이미 있는 primer를 못 찾아서 새로 주문하는 일이 생깁니다.</p>
       <aside class="notes">
-        이 도구를 만든 이유는 시간보다 "이미 있는 걸 못 찾아 새로 주문하는" 쪽이 큽니다.
-        비용도 비용이지만 주문하고 기다리는 며칠이 더 아깝습니다.
+        <b>진짜 손해는 시간이 아니라 중복 주문</b><br>
+        · 손으로 훑으면 오래 걸린다<br>
+        · 못 찾아 새로 주문하는 게 더 큼<br>
+        · 기다리는 며칠이 아깝다<br>
+        <br>
+        이걸 명령 한 줄로 대신합니다.
       </aside>
     </section>
 
@@ -56,13 +295,17 @@
 uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circular
 </script></code></pre>
       <ul style="font-size: 0.85em">
-        <li class="fragment">쓸 만한 primer를 순위대로 — 보관 위치와 원래 용도까지</li>
-        <li class="fragment">목표 구간이 어디까지 덮이는지 그림으로</li>
-        <li class="fragment">안 덮이는 자리가 남으면 새 primer 후보까지 설계</li>
+        <li class="rise" style="--i:0">쓸 만한 primer를 순위대로 — 보관 위치와 원래 용도까지</li>
+        <li class="rise" style="--i:1">목표 구간이 어디까지 덮이는지 그림으로</li>
+        <li class="rise" style="--i:2">안 덮이는 자리가 남으면 새 primer 후보까지 설계</li>
       </ul>
       <aside class="notes">
-        입력은 서열 파일 하나와 primer 목록 CSV 하나입니다.
-        구간은 위치 번호, feature 이름, 서열 조각 세 가지 방법으로 지정할 수 있습니다.
+        <b>입력은 파일 둘, 구간 지정은 세 방법</b><br>
+        · 서열 파일 + primer 목록<br>
+        · 위치 번호 / feature / 서열 조각<br>
+        · 안 주면 서열 전체가 목표<br>
+        <br>
+        실제로 돌리면 이렇게 나옵니다.
       </aside>
     </section>
 
@@ -71,7 +314,7 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
     <!-- 4 -->
     <section>
       <h2>실행 화면 ① 추천 목록</h2>
-      <pre style="font-size: 0.345em"><code class="language-plaintext" data-trim><script type="text/template">
+      <pre style="font-size: 0.420em"><code class="language-plaintext" data-trim><script type="text/template">
 대상 서열: pDEMO-1 (2,620 bp, 고리 모양)
 목표 구간: 1,261~2,160번 (900 bp)
 판독 설정: primer 뒤 100글자는 버리고 400글자를 읽음 [conservative — Azenta 안내 최적 구간 100~500번]
@@ -90,15 +333,20 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
         이 아래에 추천 이유 안내 5줄이 더 나옵니다. 그 부분은 판정 기준 대목에서 보시겠습니다.
       </p>
       <aside class="notes">
-        "꼬리"는 primer 앞쪽에 붙은 여분 서열입니다. CLONE-F는 클로닝용이라 제한효소 자리 14글자가 붙어 있습니다.
-        그 부분은 template에 안 붙지만 뒤쪽 13글자가 맞으므로 쓸 수 있다고 봅니다.
+        <b>꼬리는 primer 앞의 여분 서열</b><br>
+        · CLONE-F는 제한효소 자리 14글자<br>
+        · 안 붙지만 뒤 13글자가 맞아 씀<br>
+        · 예시는 시험용 합성 서열<br>
+        [Q] M13-F가 진짜 M13? → 이름만 빌림<br>
+        <br>
+        이 조합이 얼마나 덮는지 봅니다.
       </aside>
     </section>
 
     <!-- 5 -->
     <section>
       <h2>실행 화면 ② 덮임 그림</h2>
-      <pre style="font-size: 0.342em"><code class="language-plaintext" data-trim><script type="text/template">
+      <pre style="font-size: 0.416em"><code class="language-plaintext" data-trim><script type="text/template">
 커버리지 — primer 3개로 목표 900 bp 중 860 bp (96%)를 덮습니다
            1,261                                                  2,160
   M13-F    >=================
@@ -117,15 +365,20 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
         96%는 근사가 아니라 정확한 최댓값입니다. 근사인 것은 <strong>primer 개수</strong>뿐입니다.
       </p>
       <aside class="notes">
-        마지막 두 줄이 이 도구의 성격입니다. 스스로 못 미더운 부분을 숨기지 않고 화면에 적습니다.
-        겹침 0 bp 경고는 이 조합의 이음매를 믿지 말라는 뜻입니다.
+        <b>96%는 근사가 아니라 정확한 최댓값</b><br>
+        · 더 넣을 게 없을 때 멈춤<br>
+        · 근사인 건 primer 개수뿐<br>
+        · 못 미더운 걸 화면에 적는 도구<br>
+        [Q] 겹침 0을 왜 추천? → 빼면 0개<br>
+        <br>
+        못 쓰는 건 어떻게 거르는지.
       </aside>
     </section>
 
     <!-- 6 -->
     <section>
       <h2>실행 화면 ③ 제외와 새 설계</h2>
-      <pre style="font-size: 0.359em"><code class="language-plaintext" data-trim><script type="text/template">
+      <pre style="font-size: 0.437em"><code class="language-plaintext" data-trim><script type="text/template">
 여러 곳에 결합해 제외 (1개)
   TERM-X: 이 서열의 2곳(1,240번, 2,200번)에 결합합니다. 시퀀싱 결과가 겹쳐 나와 읽을 수 없습니다.
   primer 자체의 문제가 아니라 이 서열과 맞지 않는 것입니다.
@@ -147,8 +400,13 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
         제외 사유는 세 가지입니다 — 여러 곳에 붙음 / 유일한 자리가 너무 약함 / 목표를 못 덮음.
       </p>
       <aside class="notes">
-        양쪽 가닥 후보를 나란히 보여 주고 자동으로 고르지 않습니다.
-        어느 가닥이 나은지는 서열마다 다르고, 근거 없는 자동 선택은 근거 없는 자동 배제만큼 나쁘다고 봤습니다.
+        <b>제외 사유는 셋입니다</b><br>
+        · 여러 곳에 붙음<br>
+        · 유일한 자리가 너무 약함<br>
+        · 목표를 못 덮음<br>
+        · 양쪽 가닥은 자동으로 안 고름<br>
+        <br>
+        무엇을 기준으로 판정하는지.
       </aside>
     </section>
 
@@ -168,8 +426,11 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
         </tbody>
       </table>
       <aside class="notes">
-        네 숫자 모두 명령어 옵션으로 바꿀 수 있습니다. 하드코딩이 아닙니다.
-        지금부터 이 숫자들의 근거를 강한 것부터 약한 것 순으로 말씀드립니다.
+        <b>네 숫자 모두 옵션으로 바꿉니다</b><br>
+        · 하드코딩이 아닌 기본값<br>
+        · 근거 강한 것부터 말씀드립니다<br>
+        <br>
+        가장 확실한 둘부터.
       </aside>
     </section>
 
@@ -190,13 +451,18 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
       </div>
       <p class="cite" style="margin-top: 0.8em">Sequencher 4.8 매뉴얼 · Primer3 web help (PRIMER_SEQUENCING_LEAD 50 / SPACING 500)</p>
       <aside class="notes">
-        이 두 숫자는 외부 표준과 맞아떨어지므로 방어가 쉽습니다. 먼저 말씀드리는 이유입니다.
-        업체 공지 read length는 700에서 1050까지 다양한데, 세는 기준이 서로 달라 그대로 쓰지 않았습니다.
+        <b>이 둘은 외부 표준과 정확히 일치</b><br>
+        · 겹침 20 = Sequencher 기본값<br>
+        · 50/500 = Primer3 기본값과도 같음<br>
+        · 서로 다른 두 출처가 같은 값<br>
+        [Q] 업체는 700~1050? → 세는 기준이 다름<br>
+        <br>
+        그런데 기본값은 더 좁습니다.
       </aside>
     </section>
 
     <!-- 9 -->
-    <section>
+    <section class="slow-one">
       <h2>그런데 기본값은 더 보수적입니다</h2>
       <p style="font-size: 0.8em">기본값은 <strong>100 버리고 400 읽기</strong>입니다. 근거가 가장 강한 50/500보다 좁습니다.</p>
       <div style="font-size: 0.62em; margin: 0.6em 0">
@@ -208,17 +474,22 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
           </tbody>
         </table>
       </div>
-      <p class="fragment" style="font-size: 0.72em">두 실수의 비용이 다릅니다. 그래서 안전한 쪽으로 기울였습니다.</p>
+      <p class="rise" style="--i:0;font-size: 0.72em">두 실수의 비용이 다릅니다. 그래서 안전한 쪽으로 기울였습니다.</p>
       <aside class="notes">
-        이것이 이 도구 전체를 관통하는 원칙입니다. 대칭적이지 않은 비용에는 대칭적이지 않은 기본값을 씁니다.
-        낙관 설정을 쓰면 이 예시에서 빈 구간이 아예 사라집니다. 그만큼 설정 하나가 결과를 크게 바꿉니다.
+        <b>두 실수의 비용이 다르기 때문</b><br>
+        · 잘못 읽힌다 → 실험 재수행<br>
+        · 잘못 안 읽힌다 → primer 하나 더<br>
+        · 이 비대칭이 도구의 원칙<br>
+        [Q] 50/500으로? → 오늘 여쭐 항목<br>
+        <br>
+        조건에 걸린 건 어떻게 하는지.
       </aside>
     </section>
 
     <!-- 10 -->
     <section>
       <h2>거르지 않고, 이유를 붙입니다</h2>
-      <pre style="font-size: 0.406em"><code class="language-plaintext" data-trim><script type="text/template">
+      <pre style="font-size: 0.493em"><code class="language-plaintext" data-trim><script type="text/template">
   1번 CLONE-F: 목표 중 500글자를 덮지 못함 / 목표 중 100글자가 읽히지 않는 구간에 걸림
   2번 INS-F2: 목표 중 500글자를 덮지 못함 / 목표 중 100글자가 읽히지 않는 구간에 걸림
   3번 INS-R1: 목표 중 500글자를 덮지 못함 / 목표 중 100글자가 읽히지 않는 구간에 걸림
@@ -229,8 +500,12 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
       <p style="font-size: 0.68em">조건에 걸려도 <strong>순위를 깎지 않습니다.</strong> 무엇에 걸렸는지만 적습니다.</p>
       <p class="muted" style="font-size: 0.55em">랩에 primer가 몇 개 없으면, 빼는 순간 결과가 0개가 되기 때문입니다.</p>
       <aside class="notes">
-        이 화면이 도구의 성격을 가장 잘 보여 줍니다. 판단을 대신하지 않고 판단할 재료를 줍니다.
-        4번은 목표에 91글자로 가까워 dead zone에 걸립니다. 그래도 빼지 않고 알려만 줍니다.
+        <b>조건에 걸려도 순위를 안 깎습니다</b><br>
+        · 무엇에 걸렸는지만 알려 줌<br>
+        · 빼면 결과가 0개가 될 수 있음<br>
+        · 판단 대신 판단할 재료를 줌<br>
+        <br>
+        이 원칙이 코드에서 어떻게 보이는지.
       </aside>
     </section>
 
@@ -238,7 +513,7 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
     <section>
       <section>
         <h2>결합을 찾을 때는 Tm으로 거르지 않습니다</h2>
-        <pre style="font-size: 0.345em"><code class="language-python" data-trim data-line-numbers="1-7|9-11|12-15|16-18|19"><script type="text/template">
+        <pre style="font-size: 0.412em"><code class="language-python" data-trim data-line-numbers="1-7|9-11|12-15|16-18|19"><script type="text/template">
 def find_bindings(
     template: str,
     primer: Primer,
@@ -264,16 +539,20 @@ def find_bindings(
           13글자를 세는 일 자체는 여기서 부르는 <code>find_sites</code>가 합니다.
         </p>
         <aside class="notes">
-          이 도구가 절대 틀리면 안 되는 주장이 "이 primer는 한 곳에만 붙는다"입니다.
-          그래서 탐색 단계에서는 아무것도 거르지 않고, 강한 결합과 약한 결합을 나누는 일은 뒷단계로 미룹니다.
-          아래로 내려가면 판독 구간 숫자가 좌표로 바뀌는 코드가 있습니다.
+          <b>탐색 단계에서는 아무것도 안 거릅니다</b><br>
+          · 거르면 두 번째 자리가 사라짐<br>
+          · 한 곳에만 붙는다고 오보하게 됨<br>
+          · 절대 틀리면 안 되는 유일한 주장<br>
+          · 13글자 세기는 다른 함수가 함<br>
+          <br>
+          아래에 판독 설정 코드가 있습니다.
         </aside>
       </section>
 
       <!-- 부록 3 -->
       <section>
         <h2>부록 · 판독 설정이 좌표가 되는 곳</h2>
-        <pre style="font-size: 0.406em"><code class="language-python" data-trim><script type="text/template">
+        <pre style="font-size: 0.482em"><code class="language-python" data-trim><script type="text/template">
 def read_window(
     binding: Binding,
     *,
@@ -296,14 +575,19 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
           정방향이면 3' 끝 뒤로, 역방향이면 앞으로 셉니다. 프리셋의 두 숫자가 여기 그대로 들어갑니다.<br>
           버리는 구간을 따로 계산하는 이유는 화면에 "몇 글자가 못 읽히는 자리에 걸렸다"를 적기 위해서입니다.
         </p>
-        <aside class="notes">부록입니다. "그 숫자가 실제로 어디에 쓰이나" 질문이 나오면 보여 드립니다.</aside>
+        <aside class="notes">
+          부록. 숫자가 어디 쓰이나 물으면.<br>
+          · 정방향은 뒤로, 역방향은 앞으로<br>
+          · 프리셋 두 값이 여기 그대로<br>
+          · 버리는 구간을 따로 재는 건 안내용
+        </aside>
       </section>
     </section>
 
     <!-- ============ 4부. 어떻게 만들었는가 (4장) ============ -->
 
     <!-- 12 -->
-    <section>
+    <section class="slow-one">
       <h2>파일 다섯 개, 역할이 겹치지 않습니다</h2>
       <table style="font-size: 0.60em">
         <thead><tr><th>파일</th><th>하는 일</th><th>계층</th></tr></thead>
@@ -315,13 +599,18 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
           <tr><td>cli.py</td><td>옵션 해석과 화면 출력</td><td>화면</td></tr>
         </tbody>
       </table>
-      <p class="fragment" style="font-size: 0.62em; margin-top: 0.4em">
+      <p class="rise" style="--i:0;font-size: 0.62em; margin-top: 0.4em">
         계산 세 파일에는 화면 출력이 <strong>한 줄도 없습니다.</strong> 웹 화면을 붙일 때 <code>cli.py</code>만 갈아 끼우면 됩니다.
       </p>
       <p class="cite">소스 1,849줄 · 테스트 1,293줄 · 설계 문서 1,522줄</p>
       <aside class="notes">
-        이건 주장이 아니라 확인한 사실입니다. 계산 세 파일에 print, open, sys, logging, Path 호출이 0건입니다.
-        처음부터 웹을 붙일 걸 알고 나눴습니다.
+        <b>주장이 아니라 확인한 사실입니다</b><br>
+        · 계산 세 파일에 화면 출력 0건<br>
+        · 처음부터 웹 붙일 걸 알고 나눔<br>
+        · 화면 코드만 갈아 끼우면 됨<br>
+        [Q] 400~500줄이면 큰가? → 웹 때 나눔<br>
+        <br>
+        정직함을 지키는 코드 하나 더.
       </aside>
     </section>
 
@@ -331,7 +620,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
       <p class="muted" style="font-size: 0.48em; margin-bottom: 0.3em">
         값싼 검사는 하나가 걸려도 끝까지 셉니다. 그래야 화면의 탈락 개수가 진짜 숫자가 됩니다.
       </p>
-      <pre style="font-size: 0.315em"><code class="language-python" data-trim data-line-numbers="1-3|5-8|10-13|15-18|20-22|24-25"><script type="text/template">
+      <pre style="font-size: 0.342em"><code class="language-python" data-trim data-line-numbers="1-3|5-8|10-13|15-18|20-22|24-25"><script type="text/template">
     if set(seq) - set("ACGT"):
         rejected["bases"] = rejected.get("bases", 0) + 1
         return None  # nothing else can be measured on an undetermined sequence
@@ -363,25 +652,34 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
         구조·특이성 검사 둘은 이 뒤에 오고, 그쪽은 걸리면 즉시 멈춥니다. 그래서 그 개수는 <strong>여기를 통과한 것 중에서만</strong> 센 숫자입니다.
       </p>
       <aside class="notes">
-        처음엔 첫 조건에서 바로 멈추게 짰습니다. 그랬더니 화면이 "GC 30개 탈락"이라고 찍었는데 실제 GC 위반은 174개였습니다.
-        "이 범위를 넓히면 107개를 회수한다"가 거짓말이 됩니다. 그래서 끝까지 세도록 고쳤습니다.
+        <b>처음엔 첫 조건에서 바로 멈췄습니다</b><br>
+        · 화면은 GC 30개, 실제는 174개<br>
+        · 넓히면 회수한다가 거짓말이 됨<br>
+        · 그래서 끝까지 세도록 고침<br>
+        · 첫 조건만 예외 — 못 재니까<br>
+        <br>
+        고칠 수 있었던 건 검증을 바꿔서.
       </aside>
     </section>
 
     <!-- 14 -->
-    <section>
+    <section class="slow-steps">
       <h2>어떻게 검증했나</h2>
       <div style="font-size: 0.66em">
         <p>고리 모양 서열에서 <strong>역방향 primer 제안이 전부 틀렸습니다.</strong></p>
-        <p class="fragment">그때 테스트 111개가 전부 통과하고 있었습니다. <span class="muted">(당시 개수)</span></p>
-        <p class="fragment">원인 — 산술이 산술을 검증했을 뿐, <strong>서열을 한 번도 확인하지 않았습니다.</strong></p>
-        <p class="fragment">검증 방식을 바꿨습니다. 툴이 뱉은 답을 서열에서 되짚어 다시 찾게 했습니다.</p>
-        <p class="fragment">그러자 제안 90개 중 <strong>26개가 실패</strong>로 드러났습니다.</p>
+        <p class="rise" style="--i:0">그때 테스트 111개가 전부 통과하고 있었습니다. <span class="muted">(당시 개수)</span></p>
+        <p class="rise" style="--i:1">원인 — 산술이 산술을 검증했을 뿐, <strong>서열을 한 번도 확인하지 않았습니다.</strong></p>
+        <p class="rise" style="--i:2">검증 방식을 바꿨습니다. 툴이 뱉은 답을 서열에서 되짚어 다시 찾게 했습니다.</p>
+        <p class="rise" style="--i:3">그러자 제안 90개 중 <strong>26개가 실패</strong>로 드러났습니다.</p>
       </div>
       <aside class="notes">
-        고리 분기에만 역상보 계산이 빠져 있었습니다. plasmid는 전부 고리이므로 역방향 제안이 전부 틀린 상태였습니다.
-        특이성 필터도 못 잡았습니다. 뒤집힌 서열도 한 곳에만 붙기 때문입니다.
-        이 경험 이후로 계산 결과를 믿지 않고 서열로 되짚는 것을 규칙으로 삼았습니다.
+        <b>테스트가 다 통과하는데 틀려 있었습니다</b><br>
+        · 고리 서열 역방향 제안 전량 오류<br>
+        · plasmid는 전부 고리<br>
+        · 산술만 검증하고 서열은 안 봄<br>
+        · 특이성 필터도 못 잡음<br>
+        <br>
+        이후 서열로 되짚기를 규칙으로.
       </aside>
     </section>
 
@@ -410,8 +708,13 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
       <p style="font-size: 0.72em; margin-top: 0.6em">테스트 <strong>149개</strong> 통과, 2.6초.</p>
       <p class="muted" style="font-size: 0.55em">좌표는 검증했고, 판정 기준은 문헌 근거만 있습니다. 이 구분을 분명히 하겠습니다.</p>
       <aside class="notes">
-        테스트에 쓰는 서열은 전부 의사난수입니다. 실제 실험 데이터로 맞춰 본 적이 없습니다.
-        그래서 "검증했다"는 말을 좌표 계산에만 씁니다.
+        <b>검증했다를 두 갈래로 나눠 말합니다</b><br>
+        · 좌표 계산은 두껍게 검증<br>
+        · 녹는점 값은 확인한 적 없음<br>
+        · 테스트 서열이 전부 의사난수<br>
+        · 149는 수집 기준, 함수는 117<br>
+        <br>
+        그래서 못 미더운 걸 먼저.
       </aside>
     </section>
 
@@ -430,8 +733,13 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
           <span class="muted">그래서 100~150 구간이 낙관에서만 안 읽힙니다. 150의 출처도 업체가 아니라 다른 도구 기본값입니다.</span></li>
       </ol>
       <aside class="notes">
-        세 번째는 아무도 지적한 적 없는 논리 구멍입니다. 이번에 발표 준비하며 찾았습니다.
-        고칠지 말지는 오늘 의견을 듣고 정하려 합니다.
+        <b>셋째는 이번에 처음 찾았습니다</b><br>
+        · 40도 — 반응 온도보다 10도 낮음<br>
+        · 40.5도 — 하한과 거의 같은 자리<br>
+        · 낙관 설정이 보수보다 더 버림<br>
+        · 150의 출처도 업체가 아님<br>
+        <br>
+        나머지 둘과 실측을 이어서.
       </aside>
     </section>
 
@@ -456,8 +764,13 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
       </div>
       <p class="muted" style="font-size: 0.52em">결과를 실제로 바꾸는 건 판독 설정 하나뿐이었습니다.</p>
       <aside class="notes">
-        13과 40은 이 데이터에서 아무 일도 하지 않았습니다. 다른 데이터에서는 다를 수 있지만, 지금 근거는 이것뿐입니다.
-        SnapGene 실물 파일은 오늘 부탁드릴 항목입니다.
+        <b>13과 40은 이 데이터에서 무력했습니다</b><br>
+        · 앵커 10·16·20 모두 결과 동일<br>
+        · 하한 50까지 동일, 60에서 변화<br>
+        · 바꾸는 건 판독 설정 하나뿐<br>
+        · SnapGene은 실물이 없어 미검증<br>
+        <br>
+        이미 있는 도구로는 안 되는지.
       </aside>
     </section>
 
@@ -465,7 +778,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
 
     <section>
       <!-- 18 -->
-      <section>
+      <section class="slow-one">
         <h2>이미 있는 도구로는 안 되나</h2>
         <table style="font-size: 0.58em">
           <thead><tr><th>도구</th><th>하는 것</th><th>안 하는 것</th></tr></thead>
@@ -476,14 +789,18 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
             <tr><td>Geneious Prime</td><td>보유 primer 테스트 + 구간 나눠 읽기 설계</td><td><strong>둘을 합친 최소 조합 계산</strong></td></tr>
           </tbody>
         </table>
-        <p class="fragment" style="font-size: 0.68em; margin-top: 0.6em">
+        <p class="rise" style="--i:0;font-size: 0.68em; margin-top: 0.6em">
           Geneious가 가장 가깝습니다. 두 기능을 <em>각각</em> 줍니다. 합쳐서 "재고 N개 중 최소 조합"은 안 줍니다.
         </p>
         <p class="muted" style="font-size: 0.52em">적용 범위는 plasmid 규모입니다. 더 긴 서열에서는 느려집니다 (아래 부록).</p>
         <aside class="notes">
-          Geneious 질문이 나올 걸 예상해 미리 확인했습니다. Test with Saved Primers와 Design for Sequencing이 각각 있습니다.
-          다만 "보유 재고로 이 구간을 덮는 최소 조합"은 사람이 손으로 조합해야 합니다.
-          아래로 내려가면 버린 방법들과 성능 숫자가 있습니다.
+          <b>Geneious가 가깝지만 둘을 안 합칩니다</b><br>
+          · 재고 테스트와 tiling을 각각 제공<br>
+          · 최소 조합은 사람이 손으로<br>
+          · 적용 범위는 plasmid 규모<br>
+          [Q] SnapGene은? → 조합은 안 골라 줌<br>
+          <br>
+          아래에 버린 방법과 성능이.
         </aside>
       </section>
 
@@ -499,7 +816,12 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
             <tr><td>다중결합을 경고만 하고 남기기</td><td>SnapGene은 보여주는 도구, 이건 골라주는 도구. 못 쓸 것을 목록에 남기면 목적 배반</td></tr>
           </tbody>
         </table>
-        <aside class="notes">"왜 이 방법을 안 썼나" 질문용 부록입니다.</aside>
+        <aside class="notes">
+          부록. 왜 이 방법을 안 썼나 물으면.<br>
+          · BLAST — 결합 자리 40%를 놓침<br>
+          · 불일치 % — 3' 어긋남을 못 봄<br>
+          · Primavera — 재고 관리가 없음
+        </aside>
       </section>
 
       <!-- 부록 2 -->
@@ -517,7 +839,12 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
         <p class="muted" style="font-size: 0.52em">
           목표 구간을 지정하지 않으면 서열 전체가 목표가 됩니다. 그게 가장 느린 경로이고, 하필 기본 동작입니다.
         </p>
-        <aside class="notes">"genome이나 BAC에도 쓸 수 있나" 질문용 부록입니다. 답은 "지금 구조로는 어렵다"입니다.</aside>
+        <aside class="notes">
+          부록. 더 큰 서열도 되나 물으면.<br>
+          · plasmid는 3천~1만5천 글자<br>
+          · 12만 글자 + 후보 400개면 17초<br>
+          · 구간을 안 주면 그게 최악 경로
+        </aside>
       </section>
     </section>
 
@@ -527,12 +854,18 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <section class="hero">
       <h1>여쭙고 싶은 것 네 가지</h1>
       <ol style="font-size: 0.68em; text-align: left; margin-top: 1em">
-        <li class="fragment">판정 기준이 실험적으로 타당한가</li>
-        <li class="fragment">다음에 무엇을 만들지 우선순위</li>
-        <li class="fragment">프로젝트 범위가 맞는가</li>
-        <li class="fragment">실제 랩 운영에 붙일 수 있는가</li>
+        <li class="rise" style="--i:0">판정 기준이 실험적으로 타당한가</li>
+        <li class="rise" style="--i:1">다음에 무엇을 만들지 우선순위</li>
+        <li class="rise" style="--i:2">프로젝트 범위가 맞는가</li>
+        <li class="rise" style="--i:3">실제 랩 운영에 붙일 수 있는가</li>
       </ol>
-      <aside class="notes">여기서부터가 오늘의 본론입니다. 앞의 내용은 전부 이 네 가지를 판단하실 재료였습니다.</aside>
+      <aside class="notes">
+        <b>여기서부터가 오늘의 본론입니다</b><br>
+        · 앞의 내용은 전부 판단 재료였음<br>
+        · 넷 다 제가 혼자 못 정하는 것<br>
+        <br>
+        하나씩 여쭙겠습니다.
+      </aside>
     </section>
 
     <!-- 20 -->
@@ -541,13 +874,18 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
       <ul style="font-size: 0.68em">
         <li><strong>40도를 올려야 할까요?</strong> 반응 온도가 50도인데 탐지 하한이 40도입니다.
           <span class="muted">탐지 하한은 40으로 두고, "쓰기엔 약하다"는 경고선을 따로 둘 수도 있습니다.</span></li>
-        <li class="fragment"><strong>13글자가 맞을까요?</strong> UCSC In-Silico PCR은 15, 문헌 권고 하한은 10입니다.</li>
-        <li class="fragment"><strong>기본을 100/400에서 50/500으로 옮길까요?</strong> 후자가 외부 표준과 일치합니다.</li>
-        <li class="fragment"><strong>낙관 설정 150은 고칠까요?</strong> 논리 구멍이 있고 출처도 약합니다.</li>
+        <li class="rise" style="--i:0"><strong>13글자가 맞을까요?</strong> UCSC In-Silico PCR은 15, 문헌 권고 하한은 10입니다.</li>
+        <li class="rise" style="--i:1"><strong>기본을 100/400에서 50/500으로 옮길까요?</strong> 후자가 외부 표준과 일치합니다.</li>
+        <li class="rise" style="--i:2"><strong>낙관 설정 150은 고칠까요?</strong> 논리 구멍이 있고 출처도 약합니다.</li>
       </ul>
       <aside class="notes">
-        네 숫자 다 옵션으로 바꿀 수 있으니 기본값을 어디에 둘지가 논점입니다.
-        답을 오늘 못 정하셔도 됩니다. 어느 방향이 실험적으로 안전한지만 알려 주시면 됩니다.
+        <b>논점은 기본값을 어디 둘지입니다</b><br>
+        · 40도를 올릴지, 선을 나눌지<br>
+        · 13글자 — UCSC 15, 문헌 하한 10<br>
+        · 기본을 50/500으로 옮길지<br>
+        · 낙관 설정 150은 고칠지<br>
+        <br>
+        오늘 답 못 정하셔도 됩니다.
       </aside>
     </section>
 
@@ -564,11 +902,15 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
             <tr><td>설계한 primer를 목록에 자동 기록</td><td>지금은 화면에만 나오고 직접 적어야 함</td></tr>
           </tbody>
         </table>
-        <p class="fragment" style="font-size: 0.68em; margin-top: 0.6em">어느 것부터 할까요? 아니면 여기 없는 것이 더 급할까요?</p>
+        <p class="rise" style="--i:0;font-size: 0.68em; margin-top: 0.6em">어느 것부터 할까요? 아니면 여기 없는 것이 더 급할까요?</p>
         <p class="muted" style="font-size: 0.52em">일부러 안 만든 것들은 아래 부록에 있습니다.</p>
         <aside class="notes">
-          계산 코드와 화면 코드를 나눠 뒀으므로 웹 화면은 cli.py만 대체하면 됩니다.
-          SnapGene 검증은 실물 파일 하나만 주시면 바로 할 수 있습니다.
+          <b>웹 화면이 1순위지만 확정은 아닙니다</b><br>
+          · 화면 코드만 새로 붙이면 됨<br>
+          · SnapGene은 파일 하나면 바로<br>
+          · 그림 저장과 자동 기록은 작은 일<br>
+          <br>
+          아래에 일부러 안 만든 것들이.
         </aside>
       </section>
 
@@ -586,26 +928,36 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
             <tr><td>정확한 최소 조합 계산</td><td>탐욕 선택으로 충분. 랩에서 한두 개 차이는 무의미</td></tr>
           </tbody>
         </table>
-        <aside class="notes">"왜 이 기능이 없나" 질문용 부록입니다.</aside>
+        <aside class="notes">
+          부록. 왜 이 기능이 없나 물으면.<br>
+          · PCR용 — 설계 기준이 다름<br>
+          · 보유 이차구조 — 목록이 비어 버림<br>
+          · 정확한 최소 조합 — 차이가 무의미
+        </aside>
       </section>
     </section>
 
     <!-- 22 -->
-    <section>
+    <section class="slow-steps">
       <h2>논의 ③ 프로젝트 범위가 맞는가</h2>
       <div style="font-size: 0.7em">
         <p>전체 plasmid를 <strong>한 번에 읽는 방식</strong>이 샘플당 15달러까지 내려왔습니다.</p>
-        <p class="fragment" style="margin-top: 0.5em">그러면 여러 primer로 나눠 읽는 일이 계속 있을까요?</p>
+        <p class="rise" style="--i:0;margin-top: 0.5em">그러면 여러 primer로 나눠 읽는 일이 계속 있을까요?</p>
       </div>
-      <ul class="fragment" style="font-size: 0.6em; margin-top: 0.8em">
+      <ul class="rise" style="--i:1;font-size: 0.6em; margin-top: 0.8em">
         <li>특정 구간만 확인하는 데는 Sanger가 여전히 싸고 빠릅니다</li>
         <li>다만 <strong>새 primer 설계 기능</strong>의 가치는 달라질 수 있습니다</li>
         <li>이 질문은 설계 문서에 미해소로 적어 두고 아직 못 풀었습니다</li>
       </ul>
       <p class="muted" style="font-size: 0.52em">실험 예산과 계획을 보시는 분만 답할 수 있는 질문이라 여쭙습니다.</p>
       <aside class="notes">
-        이 질문은 프로젝트 존재 이유를 흔듭니다. 그래서 감추지 않고 정면으로 여쭙기로 했습니다.
-        답에 따라 기능 4(새 primer 설계)에 더 투자할지 말지가 갈립니다.
+        <b>이 질문은 존재 이유를 흔듭니다</b><br>
+        · 그래서 정면으로 여쭙습니다<br>
+        · 구간 확인엔 Sanger가 여전히 유리<br>
+        · 다만 설계 기능의 가치는 달라짐<br>
+        · 미해소로 적어 두고 못 풀었음<br>
+        <br>
+        마지막으로 운영 이야기입니다.
       </aside>
     </section>
 
@@ -613,18 +965,23 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <section>
       <h2>논의 ④ 랩 운영에 붙일 수 있는가</h2>
       <ul style="font-size: 0.68em">
-        <li class="fragment"><strong>이미 정리된 primer 목록이 있습니까?</strong>
+        <li class="rise" style="--i:0"><strong>이미 정리된 primer 목록이 있습니까?</strong>
           <span class="muted">있다면 열 이름이 무엇인가요. 열 이름은 옵션으로 맞출 수 있습니다.</span></li>
-        <li class="fragment"><strong>그 목록 파일을 어디에 둘까요?</strong>
+        <li class="rise" style="--i:1"><strong>그 목록 파일을 어디에 둘까요?</strong>
           <span class="muted">지금은 각자 컴퓨터 기준입니다. 공유 위치가 정해지면 안내를 바꾸겠습니다.</span></li>
-        <li class="fragment"><strong>시퀀싱은 어느 업체에 맡깁니까?</strong>
+        <li class="rise" style="--i:2"><strong>시퀀싱은 어느 업체에 맡깁니까?</strong>
           <span class="muted">업체별 판독 구간 프리셋을 채우려면 알아야 합니다.</span></li>
-        <li class="fragment"><strong>SnapGene 실물 파일을 하나 주실 수 있을까요?</strong>
+        <li class="rise" style="--i:3"><strong>SnapGene 실물 파일을 하나 주실 수 있을까요?</strong>
           <span class="muted">유일하게 남은 미검증 영역을 오늘 닫을 수 있습니다.</span></li>
       </ul>
       <aside class="notes">
-        네 질문 모두 실물 데이터가 있어야 답이 나오는 것들입니다. 설계 문서에도 미해소로 적혀 있습니다.
-        특히 마지막은 오늘 받으면 바로 검증에 들어갈 수 있습니다.
+        <b>넷 다 실물 데이터가 있어야 답이 납니다</b><br>
+        · 목록이 있으면 열 이름만 알려 주시면<br>
+        · 공유 위치가 정해지면 안내 수정<br>
+        · 업체를 알면 프리셋을 채움<br>
+        · 파일 하나면 오늘 검증 시작<br>
+        <br>
+        정리하고 마치겠습니다.
       </aside>
     </section>
 
@@ -642,9 +999,12 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
         <strong>B</strong> 화면 끄기 · <strong>?</strong> 단축키 · 주소 뒤 <strong>?print-pdf</strong> 인쇄 · <strong>?light</strong> 밝은 화면
       </p>
       <aside class="notes">
-        부록 네 장이 세 자리에 나뉘어 있습니다. 화면 번호 11번, 19번, 24번 아래입니다.
-        11번 아래에 하나, 19번 아래에 둘, 24번 아래에 하나입니다.
-        질문이 나오면 아래 화살표로 내려가면 됩니다. 오른쪽 아래 번호가 화면 번호입니다.
+        <b>오늘 말씀을 네 줄로 정리했습니다</b><br>
+        · 판정 기준 넷 중 둘은 표준과 일치<br>
+        · 좌표는 검증, 열역학은 문헌만<br>
+        · 다음은 웹 화면이 1순위<br>
+        <br>
+        부록은 11·19·24번 아래에 있습니다.
       </aside>
     </section>
 
@@ -661,7 +1021,18 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // 발표자 화면은 이 페이지를 다시 불러온다. 거기서는 등장 애니메이션을 끈다.
+  // 안 끄면 발표자가 다음 내용을 확인하려는 순간 빈 화면부터 다시 본다.
+  if (new URLSearchParams(location.search).has('receiver')) {
+    document.documentElement.classList.add('deck-no-anim');
+  }
+
   Reveal.initialize({
+    // 참고 덱과 같은 화면 크기. 기준 글자 크기도 42에서 48로 함께 올렸다(위 style 블록).
+    // 세로가 700에서 800이 되면 확대 배율이 0.875배가 되는데, 42 / 0.875 = 48 이라
+    // 두 값을 함께 바꿔야 화면 위 글자 크기가 그대로 유지된다.
+    width: 1280,
+    height: 800,
     hash: true,
     slideNumber: 'c/t',
     // 과학 발표 가이드 권고 — 화려한 전환 대신 페이드만
