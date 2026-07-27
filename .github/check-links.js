@@ -7,9 +7,11 @@
  */
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const ROOT = path.join(__dirname, '..');
-const PAGES = ['index.html', 'slides/demo/index.html'];
+// 발표자료를 새로 만들면 여기에 한 줄 더한다. 안 더하면 그 덱의 경로는 아무도 검사하지 않는다.
+const PAGES = ['index.html', 'slides/demo/index.html', 'slides/primer-inventory/index.html'];
 const fails = [];
 const fail = (m) => fails.push(m);
 
@@ -58,7 +60,22 @@ for (const dir of ['assets', 'slides']) {
   walk(dir);
 }
 
-// ── 3. 내부 문서가 공개되지 않도록 막혀 있는가 ─────────────────
+// ── 3. 페이지 안에 직접 쓴 스크립트의 문법이 맞는가 ────────────
+// 워크플로의 node --check 는 .js 파일만 본다. 발표자료 안에 직접 쓴 스크립트는
+// 문법이 틀려도 CI가 통과하고, 브라우저에서만 조용히 죽는다.
+for (const page of PAGES) {
+  const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+  // <script type="text/template"> 처럼 속성이 붙은 것은 코드가 아니므로 건너뛴다
+  for (const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+    try {
+      new vm.Script(m[1]);
+    } catch (e) {
+      fail(`${page}: 페이지 안 스크립트 문법 오류 — ${e.message}`);
+    }
+  }
+}
+
+// ── 4. 내부 문서가 공개되지 않도록 막혀 있는가 ─────────────────
 const cfg = fs.readFileSync(path.join(ROOT, '_config.yml'), 'utf8');
 for (const must of ['docs', 'CLAUDE.md', 'slides/README.md', 'node_modules']) {
   if (!new RegExp(`^\\s*-\\s*${must.replace(/[.\/]/g, '\\$&')}\\s*$`, 'm').test(cfg)) {
