@@ -53,18 +53,25 @@ assert.ok(Math.abs((400 - (-50)) / 1.8 - (400 - capped.x) / capped.k) < 1e-9, '�
 const fit = F.fitState();
 assert.deepStrictEqual(fit, { x: 0, y: 0, k: 1 }, '원위치는 배율 1에 이동 0');
 
-// ── 실제 도식 세 벌의 치수가 기본 배율에서 넘치지 않는지 ─────
-// 설계 문서가 못박은 값이다. 넘치면 슬라이드에서 잘린다.
+// ── 실제 도식 세 벌의 치수 ───────────────────────────────────
+// HTML 에 적힌 값과 같아야 한다. 이 파일은 HTML 을 읽지 않으므로 아래 검사가
+// 두 값의 표류를 막지 못한다. HTML 을 고치면 여기도 함께 고쳐야 한다.
+// 껍데기(.flow)의 안쪽 칸 가로는 슬라이드 1280 에서 테두리 2 를 뺀 1278 이다.
+const VIEW_W = 1278;
 const decks = [
-  { name: '견본 흐름도', w: 1160, h: 212, cap: 340 },
+  { name: '견본 흐름도', w: 1240, h: 216, cap: 340 },
   { name: '덮임 그림', w: 1240, h: 266, cap: 450 },
-  { name: '파일 구조 도식', w: 980, h: 496, cap: 515 }
+  { name: '파일 구조 도식', w: 980, h: 502, cap: 515 }
 ];
 for (const d of decks) {
-  assert.ok(d.w <= 1280, `${d.name}: 가로 ${d.w}가 슬라이드 1280을 넘음`);
+  assert.ok(d.w <= VIEW_W, `${d.name}: 가로 ${d.w}가 껍데기 안쪽 ${VIEW_W}를 넘음`);
   assert.ok(d.h <= d.cap, `${d.name}: 세로 ${d.h}가 상한 ${d.cap}을 넘음`);
-  assert.strictEqual(F.isPannable({ contentW: d.w, contentH: d.h, viewW: d.w, viewH: d.cap }, 1),
-    false, `${d.name}: 기본 배율에서 밀 수 있으면 안 됨`);
+  // 껍데기 세로는 도식 세로와 같게 준다. 가로는 슬라이드를 꽉 채운다.
+  const box = { contentW: d.w, contentH: d.h, viewW: VIEW_W, viewH: d.h };
+  assert.strictEqual(F.isPannable(box, 1), false, `${d.name}: 기본 배율에서 밀 수 있으면 안 됨`);
+  assert.strictEqual(F.isPannable(box, 1.01), true, `${d.name}: 조금만 키워도 밀 수 있어야 함`);
+  // 가운데 정렬 결과가 음수면 도식이 칸보다 넓다는 뜻이다.
+  assert.ok(F.clampPan(0, d.w, VIEW_W, 1) >= 0, `${d.name}: 기본 배율에서 가로가 넘침`);
 }
 
 console.log('flow.selftest: 통과');

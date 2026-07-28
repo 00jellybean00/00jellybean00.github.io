@@ -253,6 +253,9 @@
 }
 .reveal .flow-bar {
   position: absolute; top: 1px; height: 28px;
+  /* .is-gap 만 테두리를 갖는다. 크기에 포함시키지 않으면 그 막대만 50x30 으로 커져
+     40칸이 41.67칸으로 그려지고 눈금선 끝을 2px 넘어선다. */
+  box-sizing: border-box;
   border-radius: 0.25rem; background: var(--g-accent);
 }
 .reveal .flow-bar.is-total { background: var(--g-link); }

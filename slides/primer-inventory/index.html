@@ -156,7 +156,7 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
          이 도식에는 그림(SVG)을 한 조각도 쓰지 않는다. 막대와 눈금선까지 전부 글자 상자다.
          가로: 이름 칸 148 + 사이 12 + 막대 영역 1080 = 1240 (슬라이드 1280 안).
          한 칸(bp)은 1.2px. 1,261 을 0 으로 잡는다.
-         세로: 제목 36+16 + 줄 30 x 4 + 줄 간격 16 x 3 + 눈금 30 = 266 (상한 450 안). -->
+         세로: 제목 36 + 아래 16 + 줄 30 x 4 + 줄 간격 16 x 3 + 눈금 위 16 + 눈금 30 = 266 (상한 450 안). -->
     <section>
       <h2>실행 결과 ② 덮임 그림</h2>
       <div class="flow" data-prevent-swipe role="group"
@@ -185,7 +185,7 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
 
           <span class="flow-axis" style="left: 160px; top: 236px; width: 1080px"></span>
           <span class="flow-tick" style="left: 160px; top: 236px">1,261</span>
-          <span class="flow-tick" style="left: 1160px; top: 236px">2,160</span>
+          <span class="flow-tick" style="left: 1160px; top: 236px; width: 80px; text-align: right">2,160</span>
         </div>
         <div class="flow-controls">
           <button type="button" data-act="in" aria-label="도식 확대" title="확대">+</button>
@@ -438,26 +438,29 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
            계층은 상자 안이 아니라 열 위 무리 이름으로 적는다 — 색과 자리로만 나타내면
            화면을 못 보는 사람에게 전달되지 않는다.
            가로: 상자 300 x 3 + 간격 40 x 2 = 980 (슬라이드 1280 안).
-           세로: 무리 이름 40 + 상자 136 x 3 + 간격 24 x 2 = 496 (상한 515 안). -->
+           세로: 무리 이름 40 + 상자 138 x 3 + 간격 24 x 2 = 502 (상한 515 안).
+           상자 높이는 설명 줄 수에 따라 갈린다 — 두 줄이면 138, 한 줄이면 108이다.
+           138 = 파일 이름 36 + 설명 60 + 안쪽 여백 40 + 테두리 2.
+           한 줄짜리 상자는 세로 가운데를 가운데 열 두 번째 상자(중심 271)에 맞춘다. -->
       <div class="flow" data-prevent-swipe role="group"
-           aria-label="파일 다섯 개의 계층과 흐름 도식" style="height: 496px">
-        <div class="flow-canvas" style="width: 980px; height: 496px">
-          <svg class="flow-edges" viewBox="0 0 980 496" aria-hidden="true">
+           aria-label="파일 다섯 개의 계층과 흐름 도식" style="height: 502px">
+        <div class="flow-canvas" style="width: 980px; height: 502px">
+          <svg class="flow-edges" viewBox="0 0 980 502" aria-hidden="true">
             <defs>
               <marker id="flow-arrow-2" viewBox="0 0 10 10" refX="9" refY="5"
                       markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
                 <path d="M0,0 L10,5 L0,10 z"></path>
               </marker>
             </defs>
-            <path d="M 300 268 H 310 Q 320 268 320 258 V 118 Q 320 108 330 108 H 340"
+            <path d="M 300 271 H 310 Q 320 271 320 261 V 119 Q 320 109 330 109 H 340"
                   marker-end="url(#flow-arrow-2)"></path>
-            <path d="M 300 268 H 340" marker-end="url(#flow-arrow-2)"></path>
-            <path d="M 300 268 H 310 Q 320 268 320 278 V 418 Q 320 428 330 428 H 340"
+            <path d="M 300 271 H 340" marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 300 271 H 310 Q 320 271 320 281 V 423 Q 320 433 330 433 H 340"
                   marker-end="url(#flow-arrow-2)"></path>
-            <path d="M 640 108 H 650 Q 660 108 660 118 V 258 Q 660 268 670 268 H 680"
+            <path d="M 640 109 H 650 Q 660 109 660 119 V 261 Q 660 271 670 271 H 680"
                   marker-end="url(#flow-arrow-2)"></path>
-            <path d="M 640 268 H 680" marker-end="url(#flow-arrow-2)"></path>
-            <path d="M 640 428 H 650 Q 660 428 660 418 V 278 Q 660 268 670 268 H 680"
+            <path d="M 640 271 H 680" marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 640 433 H 650 Q 660 433 660 423 V 281 Q 660 271 670 271 H 680"
                   marker-end="url(#flow-arrow-2)"></path>
           </svg>
 
@@ -465,7 +468,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
           <span class="flow-group" style="left: 340px; top: 0">계산</span>
           <span class="flow-group" style="left: 680px; top: 0">화면</span>
 
-          <div class="flow-node" style="left: 0; top: 200px; width: 300px">
+          <div class="flow-node" style="left: 0; top: 217px; width: 300px">
             <span class="flow-file">readers.py</span>
             <span class="flow-desc">SnapGene 파일과 CSV 읽기</span>
           </div>
@@ -473,15 +476,15 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
             <span class="flow-file">core.py</span>
             <span class="flow-desc">primer 하나의 위치와 판독 구간과 순위</span>
           </div>
-          <div class="flow-node" style="left: 340px; top: 200px; width: 300px">
+          <div class="flow-node" style="left: 340px; top: 202px; width: 300px">
             <span class="flow-file">coverage.py</span>
             <span class="flow-desc">여러 개를 합쳐 어느 조합을 쓰고 뭐가 남는지</span>
           </div>
-          <div class="flow-node" style="left: 340px; top: 360px; width: 300px">
+          <div class="flow-node" style="left: 340px; top: 364px; width: 300px">
             <span class="flow-file">design.py</span>
             <span class="flow-desc">재고로 못 읽는 구간에 쓸 새 primer 설계</span>
           </div>
-          <div class="flow-node" style="left: 680px; top: 200px; width: 300px">
+          <div class="flow-node" style="left: 680px; top: 217px; width: 300px">
             <span class="flow-file">cli.py</span>
             <span class="flow-desc">옵션 해석과 화면 출력</span>
           </div>

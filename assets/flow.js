@@ -156,12 +156,18 @@
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  /* 화면 좌표를 껍데기 안쪽 칸 좌표로 옮긴다.
+     getBoundingClientRect 는 테두리까지 포함한 상자를 주는데 state.x 는 안쪽 칸 기준이다.
+     clientLeft/clientTop(테두리 두께)을 빼지 않으면 확대 고정점이 테두리만큼 밀린다. */
+  function toLocal(flow, cx, cy, s) {
+    var r = flow.getBoundingClientRect();
+    return { x: (cx - r.left) / s - flow.clientLeft, y: (cy - r.top) / s - flow.clientTop };
+  }
+
   function pinchMid() {
-    var r = live.view.flow.getBoundingClientRect();
-    return {
-      x: ((live.points[0].x + live.points[1].x) / 2 - r.left) / live.scale,
-      y: ((live.points[0].y + live.points[1].y) / 2 - r.top) / live.scale
-    };
+    return toLocal(live.view.flow,
+      (live.points[0].x + live.points[1].x) / 2,
+      (live.points[0].y + live.points[1].y) / 2, live.scale);
   }
 
   function onPointerDown(e) {
@@ -216,7 +222,9 @@
     for (var i = live.points.length - 1; i >= 0; i--) {
       if (live.points[i].id === e.pointerId) live.points.splice(i, 1);
     }
-    if (live.points.length < 2) live.pinch = 0;
+    /* 셋에서 둘로 줄면 남은 두 손가락으로 기준 간격을 다시 잰다.
+       안 재면 옛 짝의 간격이 새 짝의 간격과 나눠져 배율이 단번에 상한까지 튄다. */
+    live.pinch = live.points.length >= 2 ? pinchSpan() : 0;
     if (!live.points.length) {
       live.view.flow.classList.remove('is-dragging');
       live.view = null;
@@ -228,17 +236,15 @@
     var view = viewAt(e.target);
     if (!view || !interactive()) return;
     e.preventDefault();                  /* 브라우저 화면 확대를 도식 위에서만 대신 받는다 */
-    var rect = view.flow.getBoundingClientRect();
-    var s = deckScale(view.flow) || 1;
-    zoomBy(view, Math.exp(-e.deltaY * CONFIG.wheelStep),
-      (e.clientX - rect.left) / s, (e.clientY - rect.top) / s);
+    var at = toLocal(view.flow, e.clientX, e.clientY, deckScale(view.flow) || 1);
+    zoomBy(view, Math.exp(-e.deltaY * CONFIG.wheelStep), at.x, at.y);
   }
 
   function onClick(e) {
     var btn = e.target.closest ? e.target.closest('.flow-controls button') : null;
     if (!btn) return;
     var view = viewAt(btn);
-    if (!view) return;
+    if (!view || !interactive()) return;
     var act = btn.getAttribute('data-act');
     if (act === 'in') zoomBy(view, CONFIG.buttonStep);
     else if (act === 'out') zoomBy(view, 1 / CONFIG.buttonStep);
@@ -264,8 +270,11 @@
     /* 리스너는 .slides 바깥에 붙인다. 좁은 화면에서 안쪽이 통째로 다시 만들어져도 살아남는다. */
     reveal.addEventListener('pointerdown', onPointerDown);
     reveal.addEventListener('pointermove', onPointerMove);
-    reveal.addEventListener('pointerup', onPointerUp);
-    reveal.addEventListener('pointercancel', onPointerUp);
+    /* 손 떼기는 창 전체에서 듣는다. .reveal 바깥에서 떼면 끌기가 안 풀려
+       버튼을 누르지 않은 이동에도 도식이 계속 따라오는 유령 끌기가 남는다. */
+    root.addEventListener('pointerup', onPointerUp);
+    root.addEventListener('pointercancel', onPointerUp);
+    root.addEventListener('lostpointercapture', onPointerUp);
     reveal.addEventListener('click', onClick);
     /* passive:false 라야 preventDefault 로 브라우저 확대를 막을 수 있다 */
     reveal.addEventListener('wheel', onWheel, { passive: false });
