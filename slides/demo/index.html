@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>견본 발표자료</title>
-  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../../favicon.svg?v=2" type="image/svg+xml">
   <!-- 밝은 강의실 모드. 화면이 그려지기 전에 정해야 어두운 화면이 잠깐 스치지 않는다. -->
   <script>if(new URLSearchParams(location.search).has('light'))document.documentElement.classList.add('light')</script>
 
@@ -17,13 +17,16 @@
   <link rel="stylesheet" href="../../assets/galaxy-reveal.css">
 </head>
 <body>
+<!-- 별 배경 위에 얹는 두 겹. 색 얼룩과 옅은 격자다. 규칙은 assets/galaxy.css 에 있다. -->
+<div class="sky-glow" aria-hidden="true"></div>
+<div class="sky-grid" aria-hidden="true"></div>
 <div class="reveal">
   <div class="slides">
 
     <!-- 1. 타이틀 — 은하 연출은 여기와 섹션 구분에만 강하게 준다 -->
     <section class="hero" data-auto-animate>
       <h1>견본 발표자료</h1>
-      <p class="tagline">어두운 은하 배경 위에서 수식·코드·그림이 어떻게 보이는지 확인합니다</p>
+      <p class="tagline rise" style="--i:0">어두운 은하 배경 위에서 수식·코드·그림이 어떻게 보이는지 확인합니다</p>
       <aside class="notes">
         발표자 노트입니다. S 키를 누르면 이 창이 열립니다.
         발표자 화면에서는 배경의 별 애니메이션이 꺼집니다.
@@ -49,13 +52,13 @@
     <!-- 3. 섹션 구분 -->
     <section class="hero">
       <h1>수식</h1>
-      <p class="tagline">KaTeX</p>
+      <p class="tagline rise" style="--i:0">KaTeX</p>
     </section>
 
     <!-- 4. 수식 -->
     <section>
       <h2>수식은 글로 씁니다</h2>
-      <p>문장 안에 넣으면 이렇게 보입니다 — 열전도 계수 $k$, 온도 기울기 $\nabla T$.</p>
+      <p>문장 안에 쓰면 이렇게 보입니다 — 계수 $k$, 기울기 $\nabla T$.</p>
 
       <p>따로 떼어 크게 보이려면:</p>
       $$ \vec{q} = -k \nabla T $$
@@ -120,7 +123,7 @@ flowchart LR
     <section>
       <h2>그래프는 데이터만 적으면 됩니다</h2>
       <div class="figure">
-        <canvas id="demo-chart" width="900" height="380" role="img"
+        <canvas id="demo-chart" width="1029" height="434" role="img"
                 aria-label="시료 A와 시료 B의 시간에 따른 온도 변화 꺾은선 그래프"></canvas>
       </div>
       <span class="cite">Chart.js 4 — 가상의 측정값</span>
@@ -171,7 +174,7 @@ flowchart LR
     <section>
       <section>
         <h2>부록은 아래로 넣습니다</h2>
-        <p class="lead">아래 방향키를 누르면 유도 과정이 나옵니다.</p>
+        <p class="lead rise" style="--i:0">아래 방향키를 누르면 유도 과정이 나옵니다.</p>
         <p class="muted" style="font-size: 0.6em;">
           발표 중에는 건너뛰고, 질문이 나오면 내려가면 됩니다.
         </p>
@@ -179,7 +182,7 @@ flowchart LR
       </section>
       <section>
         <h2>유도 과정</h2>
-        <p>정상 상태에서 발열이 없다면 열 방정식은 라플라스 방정식이 됩니다.</p>
+        <p class="rise" style="--i:0">정상 상태에서 발열이 없다면 열 방정식은 라플라스 방정식이 됩니다.</p>
         $$ \frac{\partial T}{\partial t} = \alpha \nabla^{2} T
            \;\xrightarrow{\;\partial T/\partial t = 0\;}\; \nabla^{2} T = 0 $$
         <p class="muted" style="font-size: 0.6em;">위 방향키로 돌아갑니다.</p>
@@ -189,7 +192,7 @@ flowchart LR
     <!-- 11. 마무리 -->
     <section class="hero">
       <h1>조작법</h1>
-      <p class="tagline" style="font-size: 0.6em; line-height: 2;">
+      <p class="tagline rise" style="--i:0; font-size: 0.6em; line-height: 2;">
         방향키 · 스페이스 — 넘기기<br>
         <b>S</b> — 발표자 화면 (노트 + 다음 슬라이드)<br>
         <b>F</b> — 전체 화면 &nbsp;·&nbsp; <b>ESC</b> — 전체 슬라이드 보기<br>
@@ -216,10 +219,17 @@ flowchart LR
   // 발표자 화면은 이 페이지를 iframe으로 다시 불러온다. 거기서는 무거운 그리기를 건너뛴다.
   var params = new URLSearchParams(location.search);
   var isReceiver = params.has('receiver');
+  // 발표자 화면의 미리보기에서 등장 움직임이 다시 재생되면 안 된다.
+  // 발표자가 다음 내용을 확인하려는 순간 빈 화면부터 다시 보게 된다.
+  if (isReceiver) document.documentElement.classList.add('no-anim');
   var isPrint = params.has('print-pdf');
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   Reveal.initialize({
+    // 화면 크기와 기준 글자 크기는 짝이다. 기준 글자 48 은 galaxy-reveal.css 에 있다.
+    // 이 둘 중 하나만 바꾸면 글자가 화면에 비해 크거나 작아진다.
+    width: 1280,
+    height: 800,
     hash: true,
     slideNumber: 'c/t',
     // 과학 발표 가이드 권고 — 화려한 전환 대신 페이드만 (unknowns 해소 20번)
@@ -275,30 +285,30 @@ flowchart LR
       // 'base'라야 아래 색 지정이 온전히 먹는다. 'dark'는 자체 색을 덮어쓴다.
       theme: 'base',
       securityLevel: 'strict',
-      flowchart: { htmlLabels: false, padding: 14, nodeSpacing: 45, rankSpacing: 55 },
+      flowchart: { htmlLabels: false, padding: 16, nodeSpacing: 51, rankSpacing: 63 },
       themeVariables: {
         // 'inherit'로 두면 화면 밖 임시 칸과 슬라이드의 글꼴이 달라져
         // 한글 상자 너비를 잘못 재고 글자가 잘린다. 실제 글꼴을 그대로 적는다.
         fontFamily: '"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", -apple-system, sans-serif',
-        fontSize: '15px',
+        fontSize: '17px',
         background: 'transparent',
-        primaryColor: '#111827',
-        primaryTextColor: '#e8eaf0',
-        primaryBorderColor: '#60a5fa',
-        secondaryColor: '#1a2233',
-        secondaryTextColor: '#e8eaf0',
-        secondaryBorderColor: '#9ca3b4',
-        tertiaryColor: '#111827',
-        tertiaryTextColor: '#e8eaf0',
-        tertiaryBorderColor: '#9ca3b4',
-        lineColor: '#9ca3b4',
-        textColor: '#e8eaf0',
-        mainBkg: '#111827',
-        nodeBorder: '#60a5fa',
-        edgeLabelBackground: '#0a0e1a',
-        labelBackground: '#0a0e1a',
+        primaryColor: '#0E1220',
+        primaryTextColor: '#E2E6F0',
+        primaryBorderColor: '#A088FF',
+        secondaryColor: '#161B30',
+        secondaryTextColor: '#E2E6F0',
+        secondaryBorderColor: '#B8BFD0',
+        tertiaryColor: '#0E1220',
+        tertiaryTextColor: '#E2E6F0',
+        tertiaryBorderColor: '#B8BFD0',
+        lineColor: '#B8BFD0',
+        textColor: '#E2E6F0',
+        mainBkg: '#0E1220',
+        nodeBorder: '#A088FF',
+        edgeLabelBackground: '#06080F',
+        labelBackground: '#06080F',
         clusterBkg: 'transparent',
-        clusterBorder: '#9ca3b4'
+        clusterBorder: '#B8BFD0'
       }
     });
 
@@ -324,11 +334,11 @@ flowchart LR
   function renderChart() {
     var el = document.getElementById('demo-chart');
     if (!el || typeof Chart === 'undefined') return;
-    Chart.defaults.color = '#9ca3b4';
+    Chart.defaults.color = '#B8BFD0';
     // 캔버스는 'inherit'을 글꼴 이름으로 받지 못한다. 그대로 두면 조용히 무시되고
     // 기본값 10px sans-serif로 그려진다. 실제 글꼴 이름을 적어야 한다.
     Chart.defaults.font.family = '"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif';
-    Chart.defaults.font.size = 13;
+    Chart.defaults.font.size = 15;
     new Chart(el, {
       type: 'line',
       data: {
@@ -337,16 +347,16 @@ flowchart LR
           {
             label: '시료 A',
             data: [300, 312, 325, 334, 340, 343, 344],
-            borderColor: '#60a5fa',
-            backgroundColor: 'rgba(96, 165, 250, 0.15)',
+            borderColor: '#A088FF',
+            backgroundColor: 'rgba(160, 136, 255, 0.15)',
             tension: 0.3,
             fill: true
           },
           {
             label: '시료 B',
             data: [300, 306, 313, 319, 324, 328, 331],
-            borderColor: '#d4a843',
-            backgroundColor: 'rgba(212, 168, 67, 0.12)',
+            borderColor: '#FFD46B',
+            backgroundColor: 'rgba(255, 212, 107, 0.12)',
             tension: 0.3,
             fill: true
           }
@@ -361,11 +371,11 @@ flowchart LR
         scales: {
           x: {
             title: { display: true, text: '시간 (s)' },
-            grid: { color: 'rgba(232, 234, 240, 0.1)' }
+            grid: { color: 'rgba(226, 230, 240, 0.1)' }
           },
           y: {
             title: { display: true, text: '온도 (K)' },
-            grid: { color: 'rgba(232, 234, 240, 0.1)' }
+            grid: { color: 'rgba(226, 230, 240, 0.1)' }
           }
         }
       }

@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#0a0e1a"/>
-  <circle cx="9"  cy="8"  r="1.1" fill="#e8eaf0" opacity=".55"/>
-  <circle cx="24" cy="7"  r="0.8" fill="#e8eaf0" opacity=".4"/>
-  <circle cx="6"  cy="20" r="0.8" fill="#60a5fa" opacity=".5"/>
-  <circle cx="26" cy="23" r="1"   fill="#e8eaf0" opacity=".45"/>
-  <circle cx="14" cy="26" r="0.7" fill="#e8eaf0" opacity=".35"/>
+  <rect width="32" height="32" rx="7" fill="#06080F"/>
+  <circle cx="9"  cy="8"  r="1.1" fill="#E2E6F0" opacity=".55"/>
+  <circle cx="24" cy="7"  r="0.8" fill="#E2E6F0" opacity=".4"/>
+  <circle cx="6"  cy="20" r="0.8" fill="#2BEAD0" opacity=".5"/>
+  <circle cx="26" cy="23" r="1"   fill="#E2E6F0" opacity=".45"/>
+  <circle cx="14" cy="26" r="0.7" fill="#E2E6F0" opacity=".35"/>
   <!-- 중앙의 큰 별 -->
   <path d="M17 8.5 L18.7 14.3 L24.5 16 L18.7 17.7 L17 23.5 L15.3 17.7 L9.5 16 L15.3 14.3 Z"
-        fill="#d4a843"/>
+        fill="#A088FF"/>
 </svg>

@@ -17,7 +17,11 @@ const http = require('http');
 
 const ROOT = path.join(__dirname, '..');
 // 발표자료를 새로 만들면 여기에 한 줄 더한다. check-links.js 의 PAGES 와 같은 규칙이다.
-const DECKS = ['slides/primer-inventory/'];
+const DECKS = ['slides/primer-inventory/', 'slides/demo/'];
+// 발표 도구가 없는 페이지. 검사 5(대비비)와 7(움직임 줄이기)만 돌 수 있다.
+const PLAIN_PAGES = ['index.html'];
+// 공용 스타일. 색이 여기로 옮겨 온 뒤로는 화면 파일만 세면 놓친다.
+const SHARED_CSS = ['assets/galaxy.css', 'assets/galaxy-reveal.css'];
 const PORT = 8731;
 
 const fails = [];
@@ -107,6 +111,7 @@ async function checkDeck(browser, deck) {
   // 순서를 --i 로 적어 두고도 지연이 0 이면 전부 한꺼번에 나온다.
   const anim = await page.evaluate(async () => {
     const zero = [], perSlide = [];
+    let 등장수 = 0;
     for (let n = 0; n < Reveal.getTotalSlides(); n++) {
       Reveal.slide(...Object.values(Reveal.getIndices(Reveal.getSlides()[n])));
       await new Promise((r) => setTimeout(r, 50));
@@ -114,18 +119,21 @@ async function checkDeck(browser, deck) {
       if (!s) continue;
       const items = [...s.querySelectorAll('[style*="--i"]')];
       if (!items.length) continue;
+      등장수++;
       const ds = items.map((el) => parseFloat(getComputedStyle(el).animationDelay) || 0);
       ds.forEach((d, k) => { if (d === 0) zero.push({ 화면: n + 1, 순서: items[k].style.getPropertyValue('--i') }); });
-      perSlide.push(new Set(ds).size);
+      // 항목이 하나뿐인 장은 시차를 잴 수 없다. 여럿인 장만 센다.
+      if (items.length > 1) perSlide.push(new Set(ds).size);
     }
-    return { zero, 서로다른지연이있는장: perSlide.filter((v) => v > 1).length, 등장있는장: perSlide.length };
+    return { zero, 등장있는장: 등장수, 서로다른지연이있는장: perSlide.filter((v) => v > 1).length, 여럿인장: perSlide.length };
   });
   if (anim.등장있는장) {
     if (anim.zero.length) {
       say(`등장 지연이 0 인 항목 ${anim.zero.length}개 — 시차 등장이 죽었다 ` +
           `(animation 단축 속성이 animation-delay 를 되돌렸는지 확인). 예: ${JSON.stringify(anim.zero.slice(0, 3))}`);
     }
-    if (anim.서로다른지연이있는장 === 0) {
+    // 항목이 여럿인 장이 있는데 그중 어느 장도 시차가 없다면 지연이 죽은 것이다.
+    if (anim.여럿인장 > 0 && anim.서로다른지연이있는장 === 0) {
       say('시차 등장이 걸린 슬라이드가 하나도 없다 — 모든 항목이 같은 시각에 나온다');
     }
   }
@@ -175,6 +183,8 @@ async function checkDeck(browser, deck) {
         const s = document.querySelector('.reveal .slides section.present:not(.stack)');
         if (!s) continue;
         s.querySelectorAll('*').forEach((el) => {
+          // 화면에 안 그려지는 노드는 뺀다. mermaid 가 그림 안에 넣는 style 태그가 여기 걸린다.
+          if (['STYLE', 'SCRIPT', 'TITLE', 'DESC'].includes(el.tagName.toUpperCase())) return;
           if (![...el.childNodes].some((x) => x.nodeType === 3 && x.textContent.trim())) return;
           const st = getComputedStyle(el);
           // 글자에 그러데이션을 입힌 제목은 color 가 투명이라 이 방식으로 못 잰다
@@ -228,6 +238,71 @@ async function checkDeck(browser, deck) {
   return print.쪽수;
 }
 
+// ── 발표 도구가 없는 페이지 (첫 화면) ─────────────────────────
+// 일곱 검사 중 다섯은 발표 화면 구조(장 순회·쪽 나눔)에 묶여 있어 여기서는 못 쓴다.
+// 대비비와 움직임 줄이기 둘만 돌린다. 인쇄는 사람이 눈으로 본다.
+async function checkPlainPage(browser, pagePath) {
+  const base = `http://localhost:${PORT}/${pagePath}`;
+  const say = (m) => fail(`${pagePath} ${m}`);
+
+  for (const [mode, url] of [['어두운 모드', base + '?render-check'], ['밝은 모드', base + '?light&render-check']]) {
+    const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    await p.goto(url);
+    await p.waitForTimeout(900);
+    const bad = await p.evaluate((fnSrc) => {
+      const { parse, over, ratio, effBg } = eval(fnSrc);
+      const out = [];
+      document.querySelectorAll('body *').forEach((el) => {
+        if (['STYLE', 'SCRIPT', 'TITLE', 'DESC', 'CANVAS'].includes(el.tagName.toUpperCase())) return;
+        if (![...el.childNodes].some((x) => x.nodeType === 3 && x.textContent.trim())) return;
+        const st = getComputedStyle(el);
+        if (st.display === 'none' || st.visibility === 'hidden') return;
+        if ((st.webkitBackgroundClip || st.backgroundClip) === 'text') return;
+        const bg = effBg(el);
+        const r = ratio(over(parse(st.color), bg), bg);
+        if (r < 4.5) out.push({ 비: Math.round(r * 100) / 100, 글자: el.textContent.trim().slice(0, 16) });
+      });
+      return out;
+    }, CONTRAST_FN);
+    bad.slice(0, 5).forEach((b) => say(`${mode}: 선명도 ${b.비} (기준 4.5) — "${b.글자}"`));
+    if (bad.length > 5) say(`${mode}: 선명도 미달 ${bad.length}건 중 5건만 표시`);
+    await p.close();
+  }
+
+  const reduced = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+  await reduced.goto(base + '?render-check');
+  await reduced.waitForTimeout(900);
+  const hidden = await reduced.evaluate(() =>
+    [...document.querySelectorAll('[style*="--i"]')].filter((el) => parseFloat(getComputedStyle(el).opacity) < 0.99).length);
+  if (hidden) say(`움직임 줄이기 설정에서 안 보이는 항목 ${hidden}개`);
+  await reduced.close();
+}
+
+// ── 공용 스타일에서 파서가 버린 규칙이 있는가 ──────────────────
+// 검사 1과 같은 방식이다. 색이 공용 파일로 옮겨 간 뒤로는 화면 파일만 세면 놓친다.
+async function checkSharedCss(browser) {
+  const p = await browser.newPage();
+  // 빈 페이지는 다른 곳의 파일을 못 읽는다. 파일 내용을 직접 건네준다.
+  await p.goto(`http://localhost:${PORT}/index.html`);
+  for (const file of SHARED_CSS) {
+    const css = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    const authored = countAuthoredRules(css);
+    const parsed = await p.evaluate((text) => {
+      const el = document.createElement('style');
+      el.textContent = text;
+      document.head.appendChild(el);
+      const n = el.sheet ? el.sheet.cssRules.length : -1;
+      el.remove();
+      return n;
+    }, css);
+    if (parsed !== authored) {
+      fail(`${file}: 쓴 규칙 ${authored}개 중 브라우저가 가진 것은 ${parsed}개 — ` +
+           `${authored - parsed}개가 버려졌다 (선택자 오류이거나 주석이 잘못 닫혔다)`);
+    }
+  }
+  await p.close();
+}
+
 (async () => {
   let chromium;
   try {
@@ -241,6 +316,8 @@ async function checkDeck(browser, deck) {
   const browser = await chromium.launch();
   try {
     for (const deck of DECKS) await checkDeck(browser, deck);
+    for (const pg of PLAIN_PAGES) await checkPlainPage(browser, pg);
+    await checkSharedCss(browser);
   } finally {
     await browser.close();
     server.close();
@@ -251,5 +328,5 @@ async function checkDeck(browser, deck) {
     fails.forEach((f) => console.error('  - ' + f));
     process.exit(1);
   }
-  console.log(`화면 렌더링 검사: PASS (${DECKS.length}개 발표자료)`);
+  console.log(`화면 렌더링 검사: PASS (발표자료 ${DECKS.length} · 일반 페이지 ${PLAIN_PAGES.length} · 공용 스타일 ${SHARED_CSS.length})`);
 })();

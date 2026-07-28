@@ -1,16 +1,32 @@
 /* 갤럭시 공통 팔레트 — 랜딩과 발표자료가 함께 쓴다.
-   색값 근거: docs/blindspot/2026-07-27-revealjs-galaxy-slides-unknowns.md 해소 12번
-   #0a0e1a 위 #e8eaf0 = 대비비 약 16:1 (WCAG AAA 기준 7:1) */
+   색값 근거: docs/blindspot/2026-07-27-theme-rollout-all-pages-explainer.md 결정 6·10·11
+   #06080F 위 #E2E6F0 = 대비비 16.02 (WCAG AAA 기준 7:1)
+
+   강조(보라)만 참고 덱 원본과 다르다. 원본 #9B82FF 는 새 바탕 위에서 6.70 이라
+   이 파일이 약속한 7:1 에 못 미친다. 색조·채도는 그대로 두고 명도만 1.2% 올려
+   #A088FF (7.11) 로 잡았다. 이 값을 되돌리면 AAA 약속이 깨진다. */
 :root {
-  --g-bg: #0a0e1a;
-  --g-surface: #111827;
-  --g-text: #e8eaf0;
-  --g-muted: #9ca3b4;
-  --g-accent: #d4a843;
-  --g-link: #60a5fa;
-  --g-border: rgba(232, 234, 240, 0.12);
+  --g-bg: #06080F;
+  --g-surface: #0E1220;
+  --g-text: #E2E6F0;    /* 16.02:1 — 순백은 눈이 부셔 한 단계 낮춘다 */
+  --g-muted: #B8BFD0;   /* 10.86:1 */
+  --g-accent: #A088FF;  /*  7.11:1 */
+  --g-link: #2BEAD0;    /* 13.13:1 */
+  --g-border: rgba(160, 136, 255, 0.28);
   /* 글자 뒤 어둠 막 — 별 위에서도 대비가 유지되게 한다 (해소 20번) */
-  --g-scrim: rgba(10, 14, 26, 0.55);
+  --g-scrim: rgba(6, 8, 15, 0.55);
+
+  /* 상자 배경. 밝은 모드에는 일부러 짝을 두지 않는다 —
+     이 이름이 밝은 모드에 없어야 코드 상자가 밝은 모드에서도 어두운 채로 남는다. */
+  --g-bg-2: #161B30;
+
+  --g-pink: #FF7A95;    /*  8.07:1 */
+  --g-amber: #FFD46B;   /* 14.18:1 */
+
+  /* 카드 표면은 어둠 막과 값을 나눈다. 둘을 같은 값으로 두면
+     밝은 모드에서 카드 배경이 페이지 배경과 같아져 카드가 사라진다. */
+  --g-card: #0E1220;        /* 본문 14.93 · 보조 10.12 */
+  --g-card-hover: #161B30;  /* 본문 13.63 · 보조  9.24 */
 }
 
 /* 밝은 강의실용 화면 (unknowns 미해소 2번).
@@ -18,16 +34,22 @@
    어두운 화면은 글자가 안 보인다. 그때 현장에서 주소만 고쳐 대응한다.
    이 모드는 장식이 아니라 판독이 목적이므로 별과 성운을 끈다.
    대비비는 어두운 모드와 같은 기준을 맞췄다 — 전부 WCAG AAA(7:1) 이상.
-   본문 15.7:1 · 보조 7.8:1 · 강조 7.4:1 · 링크 8.2:1 */
+   본문 15.73 · 보조 7.83 · 강조 7.01 · 링크 7.00 · 분홍 7.05 · 호박 7.06 */
 :root.light {
   --g-bg: #f4f6fb;
   --g-surface: #ffffff;
   --g-text: #171c29;
   --g-muted: #454d5f;
-  --g-accent: #704900;
-  --g-link: #1a3fae;
-  --g-border: rgba(23, 28, 41, 0.16);
+  --g-accent: #4213FF;
+  --g-link: #095F53;
+  --g-border: rgba(66, 19, 255, 0.22);
   --g-scrim: rgba(244, 246, 251, 0.62);
+
+  --g-pink: #AB0023;
+  --g-amber: #6E4E00;
+
+  --g-card: #ffffff;        /* 본문 17.01 · 보조 8.47 */
+  --g-card-hover: #F2EFFD;  /* 본문 15.02 · 보조 7.48 */
 }
 
 :root.light { background-image: none; }
@@ -38,9 +60,9 @@
 html {
   background-color: var(--g-bg);
   background-image:
-    radial-gradient(60% 45% at 22% 18%, rgba(96, 165, 250, 0.07), transparent 70%),
-    radial-gradient(50% 40% at 80% 75%, rgba(168, 116, 220, 0.06), transparent 70%),
-    radial-gradient(45% 35% at 65% 25%, rgba(212, 168, 67, 0.035), transparent 70%);
+    radial-gradient(60% 45% at 22% 18%, rgba(160, 136, 255, 0.07), transparent 70%),
+    radial-gradient(50% 40% at 80% 75%, rgba(43, 234, 208, 0.055), transparent 70%),
+    radial-gradient(45% 35% at 65% 25%, rgba(255, 122, 149, 0.035), transparent 70%);
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
@@ -60,9 +82,62 @@ body {
   display: block;
 }
 
+/* 별 캔버스 위에 얹는 두 겹 — 색 얼룩과 옅은 격자.
+   CSS 만으로는 안 그려진다. 각 화면이 body 첫머리에 두 div 를 직접 놓아야 한다.
+   이름을 sky- 로 잡은 이유: deck- 은 이 파일에서 이미 랜딩의 발표자료 카드를 뜻한다. */
+.sky-glow,
+.sky-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.sky-glow {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(160, 136, 255, 0.13), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(43, 234, 208, 0.10), transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(255, 122, 149, 0.04), transparent 60%);
+  animation: skyDrift 18s ease-in-out infinite alternate;
+}
+@keyframes skyDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-2%, 2%) scale(1.05); }
+}
+.sky-grid {
+  background-image:
+    linear-gradient(rgba(160, 136, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160, 136, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85), transparent 75%);
+          mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85), transparent 75%);
+}
+:root.light .sky-glow,
+:root.light .sky-grid { display: none; }
+
+/* ── 등장 움직임 ─────────────────────────────────────────────
+   핵심: 처음 모습(opacity:0)을 @keyframes 의 from 에만 두고 fill-mode 를 backwards 로 준다.
+   기본 규칙에 opacity:0 을 두면 애니메이션이 안 걸리는 자리에서 내용이 영원히 사라진다.
+   그 자리는 전체 보기(ESC), 인쇄, 움직임 줄이기 설정, 발표자 화면이다.
+   이 방식이면 예외를 따로 뚫지 않아도 그 넷에서 자연히 보인다.
+
+   지연은 변수(--step, --lead)로만 조절한다. 지연값을 다른 규칙에 직접 적으면 안 된다.
+   animation 단축 속성이 생략된 animation-delay 를 0 으로 되돌리기 때문이다.
+   변수는 애니메이션 규칙이 건드리지 않으므로 낮은 특정성에서도 그대로 전달된다. */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+/* 발표 화면 밖(첫 화면)용. 발표 화면 안에서 걸리는 조건은 galaxy-reveal.css 에 있다. */
+.landing .rise {
+  animation: riseIn 0.6s ease backwards;
+  animation-delay: calc(var(--i, 0) * var(--step, 0.15s) + var(--lead, 0.05s));
+}
+
 /* 인쇄(PDF 내보내기)에서는 움직이는 별과 성운을 끄고 단색만 남긴다 (해소 17번) */
 @media print {
   #starfield { display: none !important; }
+  .sky-glow, .sky-grid { display: none !important; }
+  .rise { animation: none !important; }
   html {
     background-image: none !important;
     background-color: var(--g-bg) !important;
@@ -70,6 +145,15 @@ body {
     print-color-adjust: exact !important;
   }
 }
+/* reveal 의 인쇄는 @media print 가 아니라 클래스로 들어온다. 두 경로를 모두 막는다. */
+html.reveal-print .sky-glow, html.reveal-print .sky-grid,
+html.print-pdf .sky-glow,    html.print-pdf .sky-grid { display: none; }
+html.reveal-print .rise,
+html.print-pdf .rise { animation: none !important; }
+
+/* 발표자 화면의 미리보기에서 등장이 다시 재생되면 안 된다.
+   발표자가 다음 내용을 확인하려는 순간 빈 화면부터 다시 보게 된다. */
+html.no-anim .rise { animation: none !important; }
 
 /* ── 랜딩 페이지 ─────────────────────────────────────────── */
 
@@ -89,7 +173,7 @@ body {
 .landing h1 {
   margin: 0 0 0.6rem;
   font-size: clamp(2rem, 5.5vw, 3.25rem);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.02em;
 }
 
@@ -111,7 +195,7 @@ body {
   padding: 1.5rem;
   border: 1px solid var(--g-border);
   border-radius: 0.75rem;
-  background: var(--g-scrim);
+  background: var(--g-card);
   color: inherit;
   text-decoration: none;
   transition: border-color 0.25s, transform 0.25s, background 0.25s;
@@ -120,7 +204,7 @@ body {
 .deck-card:hover,
 .deck-card:focus-visible {
   border-color: var(--g-accent);
-  background: rgba(17, 24, 39, 0.75);
+  background: var(--g-card-hover);
   transform: translateY(-2px);
 }
 
@@ -163,4 +247,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .deck-card { transition: none; }
   .deck-card:hover, .deck-card:focus-visible { transform: none; }
+  /* 등장 움직임도 끈다. 처음 모습을 @keyframes 안에만 뒀으므로 내용은 그대로 보인다. */
+  .rise { animation: none !important; }
+  .sky-glow { animation: none; }
 }

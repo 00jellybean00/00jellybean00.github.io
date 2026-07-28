@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-Merge Quiz: 새 색과 등장 움직임을 모든 공개 화면에</title>
+<style>
+  body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+  .q { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+  .q.correct { border-color: #2e7d32; background: #edf7ed; }
+  .q.wrong { border-color: #c62828; background: #fdecea; }
+  #result { font-size: 1.2rem; font-weight: bold; margin: 1rem 0; }
+  button { padding: .6rem 1.2rem; font-size: 1rem; cursor: pointer; }
+  .summary { background: #f5f5f5; border-radius: 8px; padding: 1rem; }
+  label { display: block; }
+  label.answer { color: #2e7d32; font-weight: bold; }
+  .explain { background: #fff8e1; border-radius: 6px; padding: .5rem .8rem; margin-top: .5rem; }
+</style>
+</head>
+<body>
+<h1>Pre-Merge Quiz: 새 색과 등장 움직임을 모든 공개 화면에</h1>
+<div class="summary">
+<h2>변경 요약</h2>
+<p>웹에 공개되는 화면은 셋입니다.
+첫 화면 하나와 발표자료 둘입니다.
+지금까지는 발표자료 한 벌만 새 모습이었습니다.
+이제 셋이 같은 모습을 씁니다.</p>
+
+<p>색을 한 곳에 모았습니다.
+전에는 새 색이 발표자료 파일 안에만 적혀 있었습니다.
+이제 여러 화면이 함께 쓰는 파일에 있습니다.
+그래서 색을 한 번 바꾸면 세 화면이 같이 바뀝니다.
+전에는 화면마다 따로 고쳐야 했고, 한 곳을 빼먹으면 조용히 어긋났습니다.</p>
+
+<p>강조에 쓰는 보라를 아주 조금 밝게 바꿨습니다.
+저장소는 글자와 배경의 읽기 쉬움을 일정 수준 이상으로 지키기로 적어 뒀습니다.
+원래 보라는 그 기준에 살짝 못 미쳤습니다.
+색조와 선명함은 그대로 두고 밝기만 1.2퍼센트 올렸습니다.
+보이는 인상은 달라지지 않습니다.</p>
+
+<p>견본 발표자료의 화면 비율을 다른 발표자료와 맞췄습니다.
+글자는 화면에서 그대로 보입니다.
+대신 한 줄에 들어가는 글자가 약 17퍼센트 늘었습니다.
+도표와 그래프는 크기가 그림 안에 숫자로 박혀 있어 글자를 안 따라옵니다.
+그대로 두면 화면에서 작아져서 함께 키웠습니다.</p>
+
+<p>첫 화면과 견본 발표자료에도 항목이 떠오르며 나타나는 효과를 넣었습니다.
+견본의 두 장은 일부러 예전 방식을 유지했습니다.
+그중 한 장이 바로 "눌러서 하나씩 여는 기능"을 설명하는 장이기 때문입니다.
+자동 등장으로 바꾸면 그 장이 설명하는 기능이 자기 화면에서 사라집니다.</p>
+
+<p>자동 검사가 보는 범위를 넓혔습니다.
+전에는 발표자료 한 벌만 봤습니다.
+이제 발표자료 둘과 첫 화면과 공용 색 파일 둘을 봅니다.
+검사가 정말 잡는지 확인하려고 결함을 일부러 세 번 심어 봤습니다.
+세 번 다 검사가 실패했고, 되돌리면 다시 통과했습니다.</p>
+
+<p>작업 중에 조용한 문제 셋을 찾아 고쳤습니다.
+첫째, 색 규칙 둘이 옮기는 과정에서 사라졌습니다.
+굵은 글자의 색과 소제목의 색입니다.
+둘 다 색만 달라졌을 뿐 읽기에는 문제가 없어 자동 검사가 못 잡았습니다.
+둘째, 자동 검사 하나가 실수로 아무 일도 안 하게 된 적이 있습니다.
+검사가 통과만 하고 실제로는 아무것도 안 보고 있었습니다.
+셋째, 되돌리기 명령을 잘못 써서 아직 저장 안 한 작업이 한 번에 사라졌습니다.
+전부 복구했습니다.</p>
+
+<p>별 배경은 손대지 않았습니다.
+새 바탕 위에서 재 보니 밝기 차이가 거의 그대로였습니다.
+별을 보라로 물들이면 오히려 배경에 묻혀 사라집니다.</p>
+
+<p>이번 작업은 따로 만든 가지에서 했습니다.
+공용 파일을 고치면 세 화면이 동시에 바뀌기 때문입니다.
+확인이 끝나기 전에는 공개된 화면이 바뀌지 않습니다.</p>
+</div>
+<h2>퀴즈 — 전부 맞혀야 머지 가능</h2>
+<p>답을 고르는 데 필요한 내용은 위 '변경 요약'에 모두 들어 있습니다.</p>
+<div id="quiz"></div>
+<button onclick="grade()">정답 확인</button>
+<div id="result"></div>
+<script>
+// QUESTIONS: work-report가 이 배열을 실제 문항으로 교체한다.
+// 모든 문장은 비전문가 기준(work-report SKILL.md 4단계 규칙). explain은 필수 — 정답 확인 후 표시된다.
+const QUESTIONS = [
+  { q: "누군가 나중에 강조 색을 조금 바꾸려 합니다. 지금 구조에서는 어떻게 됩니까?",
+    options: [
+      "화면마다 따로 고쳐야 하고 빠뜨리면 어긋납니다.",
+      "한 곳만 고치면 세 화면이 같이 바뀝니다.",
+      "발표자료만 바뀌고 첫 화면은 그대로입니다.",
+      "색을 바꾸려면 새 파일을 만들어야 합니다."
+    ], answer: 1,
+    explain: "색을 여러 화면이 함께 쓰는 파일 한 곳에 모았습니다. 전에는 발표자료 파일 안에만 있어서 화면마다 복사해야 했습니다. 그 방식은 한 곳을 빼먹으면 조용히 어긋납니다." },
+
+  { q: "강조에 쓰는 보라를 아주 조금 밝게 바꿨습니다. 그 이유는 무엇입니까?",
+    options: [
+      "밝은 모드에서 색이 너무 진해 보였습니다.",
+      "예전 색과 너무 비슷해 구분이 안 됐습니다.",
+      "저장소가 지키기로 한 읽기 쉬움 기준에 못 미쳤습니다.",
+      "도표와 그래프의 색과 겹쳤습니다."
+    ], answer: 2,
+    explain: "저장소는 글자와 배경의 밝기 차이를 일정 수준 이상으로 지키기로 적어 뒀습니다. 원래 보라는 그 기준에 살짝 못 미쳤습니다. 색조와 선명함은 그대로 두고 밝기만 올려서 보이는 인상은 달라지지 않습니다." },
+
+  { q: "견본 발표자료의 화면 비율을 바꿨습니다. 도표와 그래프를 함께 키운 이유는 무엇입니까?",
+    options: [
+      "크기가 그림 안에 숫자로 박혀 있어 글자를 안 따라옵니다.",
+      "도표와 그래프가 원래 너무 작았습니다.",
+      "안 키우면 화면 밖으로 넘칩니다.",
+      "색을 바꾸면 크기도 함께 바꿔야 합니다."
+    ], answer: 0,
+    explain: "글자는 화면 크기에 맞춰 함께 커지지만 도표와 그래프는 그렇지 않습니다. 크기가 값으로 정해져 있어 그대로 두면 화면에서 작아 보입니다. 넘치지는 않으므로 세 번째 보기는 틀립니다." },
+
+  { q: "견본 발표자료의 두 장만 예전 방식을 유지했습니다. 그 이유는 무엇입니까?",
+    options: [
+      "그 두 장은 내용이 너무 길어 움직이면 어지럽습니다.",
+      "한 장이 바로 그 예전 방식을 설명하는 장입니다.",
+      "그 두 장에는 붙일 자리가 물리적으로 없습니다.",
+      "발표자가 그 두 장에서 자주 멈추기 때문입니다."
+    ], answer: 1,
+    explain: "그 장은 \"눌러서 하나씩 여는 기능\"을 보여 주는 장입니다. 자동 등장으로 바꾸면 설명하는 기능이 자기 화면에서 사라집니다. 붙일 자리가 없어서 뺀 장은 따로 있으므로 세 번째 보기는 이 두 장의 이유가 아닙니다." },
+
+  { q: "이번에 색 규칙 둘이 옮기는 과정에서 사라졌습니다. 자동 검사가 못 잡은 이유는 무엇입니까?",
+    options: [
+      "그 규칙들은 검사 대상 파일에 없었습니다.",
+      "검사를 그때 실행하지 않았습니다.",
+      "색만 달라졌을 뿐 읽기에는 문제가 없었습니다.",
+      "사라진 규칙은 화면에 안 보이는 부분이었습니다."
+    ], answer: 2,
+    explain: "검사는 글자가 배경에 묻혀 안 읽히는지를 봅니다. 색이 바뀌어도 읽기에 문제가 없으면 통과시킵니다. 이 결함은 \"안 읽힌다\"가 아니라 \"의도한 색이 아니다\"라서 원리적으로 안 잡힙니다." },
+
+  { q: "새로 넣은 자동 검사가 제 역할을 하는지 어떻게 확인했습니까?",
+    options: [
+      "검사 코드를 한 줄씩 읽어 내려가며 확인했습니다.",
+      "세 화면 모두에 돌려 결과가 같은지 봤습니다.",
+      "검사를 여러 번 돌려 결과가 흔들리지 않는지 봤습니다.",
+      "결함을 일부러 세 번 심어 검사가 실패하는지 봤습니다."
+    ], answer: 3,
+    explain: "통과만 하는 검사는 실제로 아무것도 안 보고 있을 수 있습니다. 실제로 이번에 검사 하나가 그렇게 조용히 죽었고, 결함을 심어 보고 나서야 발견했습니다. 여러 번 돌려 같은 결과가 나오는 것은 증거가 되지 않습니다." },
+
+  { q: "이번 작업은 따로 만든 가지에서 했습니다. 그 이유는 무엇입니까?",
+    options: [
+      "공용 파일을 고치면 세 화면이 동시에 바뀝니다.",
+      "고칠 파일이 많아 정리하기 어려웠습니다.",
+      "자동 검사가 가지에서만 돌아갑니다.",
+      "다른 사람이 같은 파일을 고치고 있었습니다."
+    ], answer: 0,
+    explain: "이 저장소는 본 줄기에 올리면 바로 공개됩니다. 지난 두 작업은 발표자료 한 벌만 건드려 되돌리기가 쉬웠습니다. 이번에는 잘못되면 공개된 화면 셋이 한꺼번에 망가집니다." },
+];
+const quiz = document.getElementById("quiz");
+QUESTIONS.forEach((it, i) => {
+  const d = document.createElement("div");
+  d.className = "q"; d.id = "q" + i;
+  d.innerHTML = "<p><b>Q" + (i + 1) + ".</b> " + it.q + "</p>" +
+    it.options.map((o, j) =>
+      '<label><input type="radio" name="q' + i + '" value="' + j + '"> ' + o + "</label>"
+    ).join("") +
+    '<div class="explain" hidden><b>해설.</b> ' + it.explain + "</div>";
+  quiz.appendChild(d);
+});
+function grade() {
+  let ok = 0;
+  QUESTIONS.forEach((it, i) => {
+    const sel = document.querySelector('input[name="q' + i + '"]:checked');
+    const el = document.getElementById("q" + i);
+    const good = sel && Number(sel.value) === it.answer;
+    el.className = "q " + (good ? "correct" : "wrong");
+    el.querySelectorAll("label")[it.answer].classList.add("answer");
+    el.querySelector(".explain").hidden = false;
+    if (good) ok++;
+  });
+  const r = document.getElementById("result");
+  r.textContent = ok === QUESTIONS.length
+    ? "통과 (" + ok + "/" + QUESTIONS.length + ") — 머지 가능"
+    : "미통과 (" + ok + "/" + QUESTIONS.length + ") — 오답 확인 후 재시도. 머지 금지";
+}
+</script>
+</body>
+</html>

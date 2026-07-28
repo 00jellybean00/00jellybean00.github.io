@@ -5,22 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>발표자료</title>
   <meta name="description" content="발표자료 목록">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
   <!-- 밝은 강의실 모드. 화면이 그려지기 전에 정해야 어두운 화면이 잠깐 스치지 않는다. -->
   <script>if(new URLSearchParams(location.search).has('light'))document.documentElement.classList.add('light')</script>
   <link rel="stylesheet" href="assets/galaxy.css">
 </head>
 <body>
+  <!-- 별 배경 위에 얹는 두 겹. 색 얼룩과 옅은 격자다. 규칙은 assets/galaxy.css 에 있다. -->
+  <div class="sky-glow" aria-hidden="true"></div>
+  <div class="sky-grid" aria-hidden="true"></div>
+
   <main class="landing">
     <header>
-      <h1>발표자료</h1>
-      <p class="tagline">보고 싶은 발표자료를 골라 주세요.</p>
+      <h1 class="rise" style="--i:0">발표자료</h1>
+      <p class="tagline rise" style="--i:1">보고 싶은 발표자료를 골라 주세요.</p>
     </header>
 
     <!-- 발표자료가 늘어나면 아래에 <li>를 하나 더 붙인다.
+         등장 순서 번호(--i)도 이어서 매기고 맨 아래 글의 번호를 한 칸 밀어야 한다.
          목록이 길어지면 그때 데이터 파일로 분리한다. -->
     <ul class="deck-list">
-      <li>
+      <li class="rise" style="--i:2">
         <a class="deck-card" href="slides/demo/">
           <h2>견본 발표자료</h2>
           <p>수식, 코드, 다이어그램, 그래프가 어떻게 보이는지 확인하는 견본입니다.</p>
@@ -30,7 +35,7 @@
           </div>
         </a>
       </li>
-      <li>
+      <li class="rise" style="--i:3">
         <a class="deck-card" href="slides/primer-inventory/">
           <h2>primer-inventory</h2>
           <p>랩이 가진 primer 중에서 시퀀싱에 쓸 것을 골라 주는 도구 — 구조와 판정 기준, 그리고 논의 요청.</p>
@@ -42,7 +47,7 @@
       </li>
     </ul>
 
-    <footer>
+    <footer class="rise" style="--i:4">
       <p>
         방향키 또는 스페이스로 넘기고, <kbd>S</kbd>로 발표자 화면, <kbd>F</kbd>로 전체 화면,
         <kbd>ESC</kbd>로 전체 슬라이드 보기.
