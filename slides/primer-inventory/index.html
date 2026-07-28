@@ -122,7 +122,7 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
 
     <!-- 4 -->
     <section>
-      <h2>실행 화면 ① 추천 목록</h2>
+      <h2>실행 결과 ① 추천 목록</h2>
       <pre style="font-size: 0.420em"><code class="language-plaintext" data-trim><script type="text/template">
 대상 서열: pDEMO-1 (2,620 bp, 고리 모양)
 목표 구간: 1,261~2,160번 (900 bp)
@@ -152,25 +152,61 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
       </aside>
     </section>
 
-    <!-- 5 -->
+    <!-- 5 — 구간 트랙. primer 하나가 한 줄을 차지한다(유전체 도구 관행).
+         이 도식에는 그림(SVG)을 한 조각도 쓰지 않는다. 막대와 눈금선까지 전부 글자 상자다.
+         가로: 이름 칸 148 + 사이 12 + 막대 영역 1080 = 1240 (슬라이드 1280 안).
+         한 칸(bp)은 1.2px. 1,261 을 0 으로 잡는다.
+         세로: 제목 36 + 아래 16 + 줄 30 x 4 + 줄 간격 16 x 3 + 눈금 위 16 + 눈금 30 = 266 (상한 450 안). -->
     <section>
-      <h2>실행 화면 ② 덮임 그림</h2>
-      <pre style="font-size: 0.416em"><code class="language-plaintext" data-trim><script type="text/template">
-커버리지 — primer 3개로 목표 900 bp 중 860 bp (96%)를 덮습니다
-           1,261                                                  2,160
-  M13-F    >=================
-  CLONE-F                   >==========================
-  INS-F2                                 >===========================
-           ------------------------------------------------------------
-  합계     #########################################################...
+      <h2>실행 결과 ② 덮임 그림</h2>
+      <div class="flow" data-prevent-swipe role="group"
+           aria-label="primer 세 개의 판독 구간과 합계 덮임 막대 그림" style="height: 266px">
+        <div class="flow-canvas" style="width: 1240px; height: 266px">
+          <p class="flow-title" style="left: 0; top: 0">커버리지 — primer 3개로 목표 900 bp 중 860 bp (96%)를 덮습니다</p>
 
-  덮이지 않은 구간 1곳:
-    2,121~2,160번 (40 bp)
-    --read-length 를 늘리거나 이 구간에 새 primer가 필요합니다.
-  M13-F과 CLONE-F의 판독 구간이 0 bp만 겹칩니다 (권장 20 bp 이상). 이음매 부근 결과를 믿기 어렵습니다.
-  가장 적은 조합에 가깝게 고른 것이며, 이론상 최소는 아닐 수 있습니다.
-</script></code></pre>
-      <p class="muted" style="font-size: 0.5em">
+          <div class="flow-track" style="left: 0; top: 52px; width: 1240px">
+            <span class="flow-track-name">M13-F</span>
+            <span class="flow-bar" style="left: 160px; width: 324px"></span>
+          </div>
+          <div class="flow-track" style="left: 0; top: 98px; width: 1240px">
+            <span class="flow-track-name">CLONE-F</span>
+            <span class="flow-bar" style="left: 484px; width: 486px"></span>
+          </div>
+          <div class="flow-track" style="left: 0; top: 144px; width: 1240px">
+            <span class="flow-track-name">INS-F2</span>
+            <span class="flow-bar" style="left: 687px; width: 504px"></span>
+          </div>
+          <div class="flow-track" style="left: 0; top: 190px; width: 1240px">
+            <span class="flow-track-name">합계</span>
+            <span class="flow-bar is-total" style="left: 160px; width: 1032px"></span>
+            <!-- 덮이지 않은 40칸. 색을 비우고 테두리만 남겨 빈 구간임을 드러낸다. -->
+            <span class="flow-bar is-gap" style="left: 1192px; width: 48px"></span>
+          </div>
+
+          <span class="flow-axis" style="left: 160px; top: 236px; width: 1080px"></span>
+          <span class="flow-tick" style="left: 160px; top: 236px">1,261</span>
+          <span class="flow-tick" style="left: 1160px; top: 236px; width: 80px; text-align: right">2,160</span>
+        </div>
+        <div class="flow-controls">
+          <button type="button" data-act="in" aria-label="도식 확대" title="확대">+</button>
+          <button type="button" data-act="out" aria-label="도식 축소" title="축소">−</button>
+          <button type="button" data-act="fit" aria-label="도식 원위치" title="원위치">↺</button>
+        </div>
+        <p class="flow-sr">
+          가로축은 1,261번부터 2,160번까지 900칸입니다.
+          M13-F는 1,261번부터 1,531번까지 읽습니다.
+          CLONE-F는 1,531번부터 1,936번까지 읽습니다.
+          INS-F2는 1,700번부터 2,120번까지 읽습니다.
+          셋을 합치면 1,261번부터 2,120번까지 860칸을 덮습니다.
+          2,121번부터 2,160번까지 40칸은 덮이지 않습니다.
+        </p>
+      </div>
+      <p class="muted" style="font-size: 0.42em; margin-top: 0.5em">
+        덮이지 않은 구간 1곳 — 2,121~2,160번 (40 bp). <code>--read-length</code>를 늘리거나 이 구간에 새 primer가 필요합니다.<br>
+        M13-F과 CLONE-F의 판독 구간이 0 bp만 겹칩니다 (권장 20 bp 이상). 이음매 부근 결과를 믿기 어렵습니다.<br>
+        가장 적은 조합에 가깝게 고른 것이며, 이론상 최소는 아닐 수 있습니다.
+      </p>
+      <p class="muted" style="font-size: 0.42em">
         96%는 근사가 아니라 정확한 최댓값입니다. 근사인 것은 <strong>primer 개수</strong>뿐입니다.
       </p>
       <aside class="notes">
@@ -186,7 +222,7 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
 
     <!-- 6 -->
     <section>
-      <h2>실행 화면 ③ 제외와 새 설계</h2>
+      <h2>실행 결과 ③ 제외와 새 설계</h2>
       <pre style="font-size: 0.437em"><code class="language-plaintext" data-trim><script type="text/template">
 여러 곳에 결합해 제외 (1개)
   TERM-X: 이 서열의 2곳(1,240번, 2,200번)에 결합합니다. 시퀀싱 결과가 겹쳐 나와 읽을 수 없습니다.
@@ -398,16 +434,74 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 12 -->
     <section class="slow-one">
       <h2>파일 다섯 개, 역할이 겹치지 않습니다</h2>
-      <table style="font-size: 0.60em">
-        <thead><tr><th>파일</th><th>하는 일</th><th>계층</th></tr></thead>
-        <tbody>
-          <tr><td>core.py</td><td>primer 하나 — 어디 붙고, 뭘 읽고, 몇 등인지</td><td>계산</td></tr>
-          <tr><td>coverage.py</td><td>여러 개를 합쳐 — 어느 조합을 쓰고 뭐가 남는지</td><td>계산</td></tr>
-          <tr><td>design.py</td><td>재고로 못 읽는 구간에 쓸 새 primer 설계</td><td>계산</td></tr>
-          <tr><td>readers.py</td><td>SnapGene 파일과 CSV 읽기</td><td>입출력</td></tr>
-          <tr><td>cli.py</td><td>옵션 해석과 화면 출력</td><td>화면</td></tr>
-        </tbody>
-      </table>
+      <!-- 표를 지우고 도식으로 대체한다. 이 장의 남는 세로가 137px 뿐이라 둘을 함께 둘 수 없다.
+           계층은 상자 안이 아니라 열 위 무리 이름으로 적는다 — 색과 자리로만 나타내면
+           화면을 못 보는 사람에게 전달되지 않는다.
+           가로: 상자 300 x 3 + 간격 40 x 2 = 980 (슬라이드 1280 안).
+           세로: 무리 이름 40 + 상자 138 x 3 + 간격 24 x 2 = 502 (상한 515 안).
+           상자 높이는 설명 줄 수에 따라 갈린다 — 두 줄이면 138, 한 줄이면 108이다.
+           138 = 파일 이름 36 + 설명 60 + 안쪽 여백 40 + 테두리 2.
+           한 줄짜리 상자는 세로 가운데를 가운데 열 두 번째 상자(중심 271)에 맞춘다. -->
+      <div class="flow" data-prevent-swipe role="group"
+           aria-label="파일 다섯 개의 계층과 흐름 도식" style="height: 502px">
+        <div class="flow-canvas" style="width: 980px; height: 502px">
+          <svg class="flow-edges" viewBox="0 0 980 502" aria-hidden="true">
+            <defs>
+              <marker id="flow-arrow-2" viewBox="0 0 10 10" refX="9" refY="5"
+                      markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z"></path>
+              </marker>
+            </defs>
+            <path d="M 300 271 H 310 Q 320 271 320 261 V 119 Q 320 109 330 109 H 340"
+                  marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 300 271 H 340" marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 300 271 H 310 Q 320 271 320 281 V 423 Q 320 433 330 433 H 340"
+                  marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 640 109 H 650 Q 660 109 660 119 V 261 Q 660 271 670 271 H 680"
+                  marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 640 271 H 680" marker-end="url(#flow-arrow-2)"></path>
+            <path d="M 640 433 H 650 Q 660 433 660 423 V 281 Q 660 271 670 271 H 680"
+                  marker-end="url(#flow-arrow-2)"></path>
+          </svg>
+
+          <span class="flow-group" style="left: 0; top: 0">입출력</span>
+          <span class="flow-group" style="left: 340px; top: 0">계산</span>
+          <span class="flow-group" style="left: 680px; top: 0">화면</span>
+
+          <div class="flow-node" style="left: 0; top: 217px; width: 300px">
+            <span class="flow-file">readers.py</span>
+            <span class="flow-desc">SnapGene 파일과 CSV 읽기</span>
+          </div>
+          <div class="flow-node" style="left: 340px; top: 40px; width: 300px">
+            <span class="flow-file">core.py</span>
+            <span class="flow-desc">primer 하나의 위치와 판독 구간과 순위</span>
+          </div>
+          <div class="flow-node" style="left: 340px; top: 202px; width: 300px">
+            <span class="flow-file">coverage.py</span>
+            <span class="flow-desc">여러 개를 합쳐 어느 조합을 쓰고 뭐가 남는지</span>
+          </div>
+          <div class="flow-node" style="left: 340px; top: 364px; width: 300px">
+            <span class="flow-file">design.py</span>
+            <span class="flow-desc">재고로 못 읽는 구간에 쓸 새 primer 설계</span>
+          </div>
+          <div class="flow-node" style="left: 680px; top: 217px; width: 300px">
+            <span class="flow-file">cli.py</span>
+            <span class="flow-desc">옵션 해석과 화면 출력</span>
+          </div>
+        </div>
+        <div class="flow-controls">
+          <button type="button" data-act="in" aria-label="도식 확대" title="확대">+</button>
+          <button type="button" data-act="out" aria-label="도식 축소" title="축소">−</button>
+          <button type="button" data-act="fit" aria-label="도식 원위치" title="원위치">↺</button>
+        </div>
+        <p class="flow-sr">
+          입출력 계층에 readers.py 하나가 있습니다.
+          계산 계층에 core.py와 coverage.py와 design.py 셋이 있습니다.
+          화면 계층에 cli.py 하나가 있습니다.
+          읽어들인 값이 입출력에서 계산 세 파일로 갑니다.
+          계산 결과가 화면 파일로 갑니다.
+        </p>
+      </div>
       <p class="rise" style="--i:0;font-size: 0.62em; margin-top: 0.4em">
         계산 세 파일에는 화면 출력이 <strong>한 줄도 없습니다.</strong> 웹 화면을 붙일 때 <code>cli.py</code>만 갈아 끼우면 됩니다.
       </p>
@@ -824,6 +918,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
 <script src="../vendor/reveal/plugin/highlight.js"></script>
 <script src="../vendor/reveal/plugin/notes.js"></script>
 <script src="../../assets/starfield.js"></script>
+<script src="../../assets/flow.js"></script>
 <script>
 (function () {
   'use strict';
@@ -852,6 +947,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
   }).then(function () {
     // 초기화와 후처리를 따로 감싼다. 후처리가 실패해도 슬라이드는 넘어가야 한다.
     try { alignTerminalBlocks(); } catch (err) { console.warn('글자 폭 보정을 건너뜁니다:', err); }
+    try { Flow.init(); } catch (err) { console.warn('도식 조작을 붙이지 못했습니다:', err); }
   }).catch(function (err) {
     console.error('슬라이드 초기화에 실패했습니다:', err);
   });

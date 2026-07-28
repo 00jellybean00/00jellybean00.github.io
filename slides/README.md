@@ -7,6 +7,7 @@
 /assets/galaxy.css       공통 색 팔레트 + 배경 두 겹 + 등장 움직임 + 랜딩 스타일
 /assets/galaxy-reveal.css  reveal.js 위에 얹는 갤럭시 테마
 /assets/starfield.js     마우스를 따라 움직이는 별 배경 (랜딩·발표자료 공용)
+/assets/flow.js          도식(.flow) 밀기·확대 (발표자료 공용)
 /slides/<슬러그>/index.html  발표자료 하나
 /slides/vendor/          reveal.js·KaTeX·Chart.js·Mermaid 사본 (인터넷 없이 동작)
 ```
@@ -33,6 +34,7 @@ python3 -m http.server 8000
 
 ```bash
 node assets/starfield.selftest.js   # 별 개수·밝기·이동폭 상한, 애니메이션 루프 수명
+node assets/flow.selftest.js        # 배율 상하한, 밀기 경계, 세 도식의 치수
 node .github/check-links.js         # 배포에서만 깨지는 경로, 문서 공개 차단
 node .github/check-render.js        # 브라우저로 실제 그려 확인 (playwright 필요)
 ```

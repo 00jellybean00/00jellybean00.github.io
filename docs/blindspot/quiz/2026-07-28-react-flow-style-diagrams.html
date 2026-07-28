@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-Merge Quiz: React Flow 스타일 도식 개편</title>
+<style>
+  body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+  .q { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+  .q.correct { border-color: #2e7d32; background: #edf7ed; }
+  .q.wrong { border-color: #c62828; background: #fdecea; }
+  #result { font-size: 1.2rem; font-weight: bold; margin: 1rem 0; }
+  button { padding: .6rem 1.2rem; font-size: 1rem; cursor: pointer; }
+  .summary { background: #f5f5f5; border-radius: 8px; padding: 1rem; }
+  label { display: block; }
+  label.answer { color: #2e7d32; font-weight: bold; }
+  .explain { background: #fff8e1; border-radius: 6px; padding: .5rem .8rem; margin-top: .5rem; }
+</style>
+</head>
+<body>
+<h1>Pre-Merge Quiz: React Flow 스타일 도식 개편</h1>
+<div class="summary">
+<h2>변경 요약</h2>
+<p>발표 자료 안의 도식 세 곳을 모두 새로 만들었습니다.
+견본 자료의 흐름도, 발표용 자료의 덮임 그림, 발표용 자료의 파일 구조 설명입니다.</p>
+
+<p>이제 도식을 마우스로 끌어 옮기고 확대할 수 있습니다.
+확대는 Ctrl 키를 누른 채 휠을 굴리거나 단추를 눌러 합니다.
+그냥 휠만 굴리면 아무 일도 일어나지 않습니다.
+만지는 화면에서는 두 손가락을 벌려도 확대됩니다.
+다만 휴대폰처럼 좁은 화면에서는 이 세 방법이 모두 꺼집니다.</p>
+
+<p>밀 수 있는 범위는 도식 가장자리 안으로 제한됩니다.
+그래서 확대하지 않은 기본 상태에서는 끌어도 아무 데도 가지 않습니다.
+도식 전체가 이미 화면에 다 들어와 있어 갈 곳이 없기 때문입니다.
+확대해야 화면 밖으로 나가는 부분이 생기고 그때부터 밀 수 있습니다.</p>
+
+<p>발표 중 사고를 막는 장치를 넣었습니다.
+슬라이드를 넘기면 확대와 위치가 처음으로 돌아갑니다.
+전체 보기, 좁은 화면, 발표자 화면, 인쇄 네 상황에서는 조작이 꺼지고 단추도 사라집니다.
+눌러도 아무 일이 없는 단추를 남기면 오해를 주기 때문입니다.
+좁은 화면에서 조작을 끄는 이유는 따로 있습니다.
+그 화면에서는 세로로 죽 읽는 것이 우선이라 손가락 스크롤이 평소대로 살아 있어야 합니다.
+그래서 좁은 화면에서는 두 손가락 확대도 함께 꺼집니다.</p>
+
+<p>덮임 그림은 글자로 흉내 내던 막대에서 진짜 가로 막대 그림이 되었습니다.
+가로축은 900칸이고 그중 860칸이 덮입니다.
+덮이지 않은 40칸은 색을 비우고 테두리만 남겨 표시합니다.</p>
+
+<p>파일 구조를 설명하던 표는 지우고 도식으로 대체했습니다.
+그 장에 남는 세로 공간이 137픽셀뿐이라 표와 도식을 함께 둘 수 없었습니다.
+계층 이름은 상자 안이 아니라 각 열 위에 무리 이름으로 적었습니다.
+글자로 적지 않으면 화면을 못 보는 사람에게 전달되지 않기 때문입니다.</p>
+
+<p>도식 전체를 하나의 그림으로 선언하지 않았습니다.
+그렇게 하면 안의 글자가 전부 안 읽히고 이름표 한 줄로 대체됩니다.
+대신 상자 글자를 그대로 읽히게 두고, 상자 사이 관계는 눈에 안 보이는 문장으로 따로 적었습니다.</p>
+
+<p>"실행 화면 ①②③" 세 장의 제목을 "실행 결과"로 고쳤습니다.
+가운데 장이 실제 화면이 아니라 다듬어진 그림이 되었기 때문입니다.
+앞뒤 두 장은 원래 손볼 대상이 아니었지만 세 장의 흐름을 맞추려고 함께 고쳤습니다.</p>
+
+<p>새 도식은 이 저장소가 이미 쓰던 색 이름표만 씁니다.
+다만 어두운 상자 배경에 쓰는 이름 하나는 일부러 피했습니다.
+그 이름은 밝은 화면 모드에서도 배경을 어둡게 고정합니다.
+반면 글자색은 밝은 화면 모드 값으로 함께 바뀝니다.
+그래서 안에 글자를 넣으면 어두운 배경에 어두운 글자가 됩니다.
+과거에 같은 조건으로 사고가 난 적이 있습니다.</p>
+
+<p>외부 도구를 새로 들이지 않고 직접 만들었습니다.
+React Flow 자체는 React라는 화면 도구가 있어야 돌아가는데, 이 저장소의 발표 자료는 순수한 웹 문서입니다.</p>
+
+<p>상자를 하나씩 집어 옮기는 기능은 넣지 않았습니다.
+화면 전체만 움직입니다.</p>
+</div>
+<h2>퀴즈 — 전부 맞혀야 머지 가능</h2>
+<p>답을 고르는 데 필요한 내용은 위 '변경 요약'에 모두 들어 있습니다.</p>
+<div id="quiz"></div>
+<button onclick="grade()">정답 확인</button>
+<div id="result"></div>
+<script>
+const QUESTIONS = [
+  { q: "발표자가 확대하지 않은 도식을 마우스로 끌었습니다. 무슨 일이 일어나나요?",
+    options: [
+      "도식이 끈 만큼 옆으로 밀립니다.",
+      "도식이 자동으로 확대됩니다.",
+      "도식이 움직이지 않습니다.",
+      "다음 슬라이드로 넘어갑니다."
+    ], answer: 2,
+    explain: "밀 수 있는 범위가 도식 가장자리 안으로 제한돼 있습니다. 확대하지 않으면 도식 전체가 이미 보이므로 갈 곳이 없습니다. 첫 보기는 확대한 뒤에만 맞습니다." },
+
+  { q: "청중이 휴대폰으로 자료를 열고 도식 위에서 손가락을 위아래로 쓸었습니다. 무슨 일이 일어나나요?",
+    options: [
+      "도식만 위아래로 조금씩 밀립니다.",
+      "화면이 위아래로 스크롤됩니다.",
+      "도식이 손가락 방향으로 확대됩니다.",
+      "조작 단추 묶음이 새로 나타납니다."
+    ], answer: 1,
+    explain: "좁은 화면에서는 조작을 일부러 끕니다. 그 화면에서는 세로로 죽 읽는 것이 우선이기 때문입니다. 조작을 켜 두면 손가락 스크롤이 막혀 그 장을 읽을 수 없게 됩니다." },
+
+  { q: "발표자가 도식을 확대한 채 다음 장으로 넘어갔다가 되돌아왔습니다. 도식은 어떤 상태인가요?",
+    options: [
+      "확대한 그대로 남아 있습니다.",
+      "확대는 풀리고 위치만 남습니다.",
+      "되돌아온 뒤 확대 단추가 사라져 있습니다.",
+      "확대가 풀린 처음 상태입니다."
+    ], answer: 3,
+    explain: "슬라이드를 벗어나면 확대와 위치가 모두 처음으로 돌아갑니다. 되돌리지 않으면 발표 중 예상 못 한 화면이 나옵니다. 첫 보기처럼 두면 발표자가 당황하게 됩니다." },
+
+  { q: "새 도식을 어두운 배경으로 고정되는 색 이름에 담았다고 가정해 봅시다. 밝은 화면 모드에서 무엇이 문제인가요?",
+    options: [
+      "어두운 배경에 어두운 글자가 됩니다.",
+      "상자 테두리가 두 겹으로 겹쳐 보입니다.",
+      "도식이 슬라이드 밖으로 밀려납니다.",
+      "확대 단추를 눌러도 아무 일이 없습니다."
+    ], answer: 0,
+    explain: "그 틀은 밝은 모드에서도 배경을 어둡게 고정합니다. 반면 글자색은 밝은 모드 값으로 바뀝니다. 과거에 같은 조건으로 사고가 나서 새 도식은 그 틀과 그 색 이름을 피했습니다." },
+
+  { q: "파일 구조 도식을 넣으면서 원래 있던 표를 지웠습니다. 표를 남길 수 없었던 이유는 무엇인가요?",
+    options: [
+      "표가 있으면 밀기 기능이 켜지지 않습니다.",
+      "표를 지우면 계층이 낭독기에 안 들립니다.",
+      "그 장에 둘을 함께 둘 자리가 없습니다.",
+      "표는 인쇄할 때 두 쪽으로 나뉩니다."
+    ], answer: 2,
+    explain: "그 장의 남는 세로 공간이 137픽셀인데 표만 385픽셀이었습니다. 내용이 슬라이드를 넘치면 스크롤 없이 잘립니다. 그래서 도식이 표의 세 가지 정보를 모두 담게 했습니다." },
+
+  { q: "화면을 못 보는 사람이 낭독기로 파일 구조 도식을 듣습니다. 계층은 어떻게 전달되나요?",
+    options: [
+      "상자 색이 계층마다 달라 색 이름을 읽어 줍니다.",
+      "각 열 위에 적힌 무리 이름을 읽어 줍니다.",
+      "상자 위치를 좌표로 읽어 줍니다.",
+      "계층은 전달되지 않습니다."
+    ], answer: 1,
+    explain: "위치와 색만으로 나타내면 소리로는 전달되지 않습니다. 그래서 계층 이름을 열 위에 글자로 적었습니다. 도식 전체를 하나의 그림으로 선언하지 않은 것도 같은 이유입니다." },
+
+  { q: "리뷰어가 도식의 상자를 하나 집어 옮겨 보려 했지만 되지 않았습니다. 왜 그런가요?",
+    options: [
+      "상자 옮기기는 일부러 넣지 않았습니다.",
+      "확대한 상태에서만 상자를 옮길 수 있습니다.",
+      "단추를 먼저 눌러야 상자가 풀립니다.",
+      "만지는 화면에서만 상자를 옮길 수 있습니다."
+    ], answer: 0,
+    explain: "화면 전체만 움직이기로 했고 상자 개별 이동은 넣지 않았습니다. 그 기능을 넣으면 연결선을 실시간으로 다시 그리는 장치가 필요합니다. 나머지 보기는 모두 없는 기능입니다." }
+];
+const quiz = document.getElementById("quiz");
+QUESTIONS.forEach((it, i) => {
+  const d = document.createElement("div");
+  d.className = "q"; d.id = "q" + i;
+  d.innerHTML = "<p><b>Q" + (i + 1) + ".</b> " + it.q + "</p>" +
+    it.options.map((o, j) =>
+      '<label><input type="radio" name="q' + i + '" value="' + j + '"> ' + o + "</label>"
+    ).join("") +
+    '<div class="explain" hidden><b>해설.</b> ' + it.explain + "</div>";
+  quiz.appendChild(d);
+});
+function grade() {
+  let ok = 0;
+  QUESTIONS.forEach((it, i) => {
+    const sel = document.querySelector('input[name="q' + i + '"]:checked');
+    const el = document.getElementById("q" + i);
+    const good = sel && Number(sel.value) === it.answer;
+    el.className = "q " + (good ? "correct" : "wrong");
+    el.querySelectorAll("label")[it.answer].classList.add("answer");
+    el.querySelector(".explain").hidden = false;
+    if (good) ok++;
+  });
+  const r = document.getElementById("result");
+  r.textContent = ok === QUESTIONS.length
+    ? "통과 (" + ok + "/" + QUESTIONS.length + ") — 머지 가능"
+    : "미통과 (" + ok + "/" + QUESTIONS.length + ") — 오답 확인 후 재시도. 머지 금지";
+}
+</script>
+</body>
+</html>
