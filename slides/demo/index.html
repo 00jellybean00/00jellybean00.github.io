@@ -39,7 +39,7 @@
       <ol>
         <li class="fragment">수식 (LaTeX)</li>
         <li class="fragment">코드와 강조</li>
-        <li class="fragment">다이어그램 (Mermaid)</li>
+        <li class="fragment">도식 (밀기·확대)</li>
         <li class="fragment">그래프 (Chart.js)</li>
         <li class="fragment">표·출처·부록</li>
       </ol>
@@ -99,23 +99,56 @@ flux = -0.6 * gradient(T, dx=0.01)   # k = 0.6 W/mK
       </aside>
     </section>
 
-    <!-- 6. 다이어그램 -->
+    <!-- 6. 다이어그램 — 상자는 글자(HTML), 연결선만 그림(SVG).
+         상자 자리는 left/top 으로만 준다. transform 으로 주면 등장 효과가 좌표를 지운다.
+         가로 계산: 상자 200 x 5 + 간격 60 x 4 = 1240 (슬라이드 1280 안).
+         세로 계산: 상자 76 x 2 + 줄 간격 60 = 212 (상한 340 안). -->
     <section>
-      <h2>다이어그램도 글로 그립니다</h2>
-      <div class="figure">
-        <pre class="mermaid">
-flowchart LR
-  A[측정 데이터] --> B{이상치 제거}
-  B -- 통과 --> C[보정]
-  B -- 탈락 --> D[재측정]
-  C --> E[모델 적합]
-  D --> A
-  E --> F[결과 보고]
-        </pre>
+      <h2>도식은 밀고 확대할 수 있습니다</h2>
+      <div class="flow" data-prevent-swipe role="group"
+           aria-label="측정 데이터부터 결과 보고까지의 처리 흐름도" style="height: 212px">
+        <div class="flow-canvas" style="width: 1240px; height: 212px">
+          <svg class="flow-edges" viewBox="0 0 1240 212" aria-hidden="true">
+            <defs>
+              <!-- markerUnits 를 userSpaceOnUse 로 두어야 선을 굵혀도 화살촉이 안 커진다 -->
+              <marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                      markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z"></path>
+              </marker>
+            </defs>
+            <path d="M 200 38 H 260" marker-end="url(#flow-arrow)"></path>
+            <path d="M 460 38 H 520" marker-end="url(#flow-arrow)"></path>
+            <path d="M 720 38 H 780" marker-end="url(#flow-arrow)"></path>
+            <path d="M 980 38 H 1040" marker-end="url(#flow-arrow)"></path>
+            <path d="M 360 76 V 136" marker-end="url(#flow-arrow)"></path>
+            <path d="M 260 174 H 110 Q 100 174 100 164 V 76" marker-end="url(#flow-arrow)"></path>
+          </svg>
+          <div class="flow-node" style="left: 0; top: 0; width: 200px">측정 데이터</div>
+          <div class="flow-node is-decision" style="left: 260px; top: 0; width: 200px">이상치 제거</div>
+          <div class="flow-node" style="left: 520px; top: 0; width: 200px">보정</div>
+          <div class="flow-node" style="left: 780px; top: 0; width: 200px">모델 적합</div>
+          <div class="flow-node" style="left: 1040px; top: 0; width: 200px">결과 보고</div>
+          <div class="flow-node" style="left: 260px; top: 136px; width: 200px">재측정</div>
+          <span class="flow-label" style="left: 464px; top: 23px">통과</span>
+          <span class="flow-label" style="left: 368px; top: 91px">탈락</span>
+        </div>
+        <div class="flow-controls">
+          <button type="button" data-act="in" aria-label="도식 확대" title="확대">+</button>
+          <button type="button" data-act="out" aria-label="도식 축소" title="축소">−</button>
+          <button type="button" data-act="fit" aria-label="도식 원위치" title="원위치">↺</button>
+        </div>
+        <p class="flow-sr">
+          측정 데이터에서 이상치 제거로 갑니다.
+          이상치 제거에서 통과하면 보정으로 갑니다.
+          이상치 제거에서 탈락하면 재측정으로 갑니다.
+          보정에서 모델 적합으로 갑니다.
+          모델 적합에서 결과 보고로 갑니다.
+          재측정한 것은 다시 측정 데이터로 돌아옵니다.
+        </p>
       </div>
-      <span class="cite">Mermaid 11 — 순서도를 텍스트로 기술</span>
+      <span class="cite">flow — 상자는 글자 상자, 선은 그림</span>
       <aside class="notes">
-        화살표와 상자를 글로 적으면 그림이 됩니다. 그림 파일을 따로 관리할 필요가 없습니다.
+        상자 자리를 좌표로 적으면 도식이 됩니다. 끌어서 옮기고 Ctrl과 함께 굴려 확대할 수 있습니다.
       </aside>
     </section>
 
@@ -209,9 +242,9 @@ flowchart LR
 <script src="../vendor/reveal/plugin/highlight.js"></script>
 <script src="../vendor/reveal/plugin/math.js"></script>
 <script src="../vendor/reveal/plugin/notes.js"></script>
-<!-- mermaid는 3.4MB라 여기서 미리 부르지 않는다. 다이어그램이 있을 때만 불러온다. -->
 <script src="../vendor/chart/chart.umd.min.js"></script>
 <script src="../../assets/starfield.js"></script>
+<script src="../../assets/flow.js"></script>
 <script>
 (function () {
   'use strict';
@@ -241,95 +274,10 @@ flowchart LR
   }).then(function () {
     // 둘을 따로 감싼다. 하나가 실패해도 나머지는 그려져야 한다.
     try { renderChart(); } catch (err) { console.warn('그래프를 그리지 못했습니다:', err); }
-    return renderMermaid();
+    try { Flow.init(); } catch (err) { console.warn('도식 조작을 붙이지 못했습니다:', err); }
   }).catch(function (err) {
     console.error('슬라이드 초기화에 실패했습니다:', err);
   });
-
-  function loadScript(src) {
-    return new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = src;
-      s.onload = resolve;
-      s.onerror = function () { reject(new Error(src + ' 를 불러오지 못했습니다')); };
-      document.head.appendChild(s);
-    });
-  }
-
-  // reveal은 현재 슬라이드 말고는 전부 display:none으로 감춘다.
-  // 감춰진 칸에서는 글자 크기를 잴 수 없어 mermaid.run()이 깨진다.
-  // 그래서 mermaid.render()로 화면 밖 임시 칸에서 그린 뒤 결과만 옮겨 심는다.
-  function renderMermaid() {
-    var nodes = document.querySelectorAll('pre.mermaid');
-    // 발표자 화면은 이 페이지를 두 번 더 불러온다. 거기까지 3.4MB를 세 번 읽으면
-    // 발표용 노트북이 눈에 띄게 느려진다. 발표자 화면 쪽은 다이어그램을 건너뛴다.
-    if (!nodes.length || isReceiver) return Promise.resolve();
-
-    return loadScript('../vendor/mermaid/mermaid.min.js')
-      .then(function () { return drawMermaid(nodes); })
-      .catch(function (err) {
-        setFallback(nodes, '다이어그램을 불러오지 못했습니다.');
-        console.warn('다이어그램 렌더 실패 — 그림 파일로 대체하세요:', err);
-      });
-  }
-
-  function setFallback(nodes, message) {
-    Array.prototype.forEach.call(nodes, function (el) {
-      el.innerHTML = '<p class="muted">' + message + '</p>';
-    });
-  }
-
-  function drawMermaid(nodes) {
-    mermaid.initialize({
-      startOnLoad: false,
-      // 'base'라야 아래 색 지정이 온전히 먹는다. 'dark'는 자체 색을 덮어쓴다.
-      theme: 'base',
-      securityLevel: 'strict',
-      flowchart: { htmlLabels: false, padding: 16, nodeSpacing: 51, rankSpacing: 63 },
-      themeVariables: {
-        // 'inherit'로 두면 화면 밖 임시 칸과 슬라이드의 글꼴이 달라져
-        // 한글 상자 너비를 잘못 재고 글자가 잘린다. 실제 글꼴을 그대로 적는다.
-        fontFamily: '"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", -apple-system, sans-serif',
-        fontSize: '17px',
-        background: 'transparent',
-        primaryColor: '#0E1220',
-        primaryTextColor: '#E2E6F0',
-        primaryBorderColor: '#A088FF',
-        secondaryColor: '#161B30',
-        secondaryTextColor: '#E2E6F0',
-        secondaryBorderColor: '#B8BFD0',
-        tertiaryColor: '#0E1220',
-        tertiaryTextColor: '#E2E6F0',
-        tertiaryBorderColor: '#B8BFD0',
-        lineColor: '#B8BFD0',
-        textColor: '#E2E6F0',
-        mainBkg: '#0E1220',
-        nodeBorder: '#A088FF',
-        edgeLabelBackground: '#06080F',
-        labelBackground: '#06080F',
-        clusterBkg: 'transparent',
-        clusterBorder: '#B8BFD0'
-      }
-    });
-
-    var jobs = Array.prototype.map.call(nodes, function (el, i) {
-      // 하나가 실패해도 나머지 다이어그램은 그려져야 한다.
-      return mermaid.render('mmd-' + i, dedent(el.textContent))
-        .then(function (out) { el.innerHTML = out.svg; })
-        .catch(function (err) {
-          el.innerHTML = '<p class="muted">다이어그램을 그리지 못했습니다.</p>';
-          console.warn('다이어그램 렌더 실패 — 그림 파일로 대체하세요:', err);
-        });
-    });
-    return Promise.all(jobs).then(function () { Reveal.layout(); });
-  }
-
-  // HTML 들여쓰기가 그대로 딸려 오면 mermaid가 문법 오류로 본다.
-  function dedent(text) {
-    var lines = text.replace(/\t/g, '  ').split('\n').filter(function (l) { return l.trim(); });
-    var indent = Math.min.apply(null, lines.map(function (l) { return l.match(/^ */)[0].length; }));
-    return lines.map(function (l) { return l.slice(indent); }).join('\n');
-  }
 
   function renderChart() {
     var el = document.getElementById('demo-chart');

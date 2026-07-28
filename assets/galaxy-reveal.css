@@ -152,8 +152,166 @@
   background: var(--g-bg-2);
   text-align: center;
 }
-.reveal .figure pre.mermaid { background: none; border: none; box-shadow: none; }
-.reveal .mermaid svg { max-width: 100%; height: auto; }
+
+/* ── 도식(flow) ─────────────────────────────────────────────
+   상자는 글자(HTML), 연결선만 그림(SVG). 설계 근거는
+   docs/blindspot/2026-07-28-react-flow-style-diagrams-explainer.md 에 있다.
+
+   .figure 에 담지 않는 이유: 그 상자는 밝은 모드에서 배경을 --g-bg-2 로 고정한다.
+   안에 글자 상자를 넣으면 어두운 배경에 어두운 글자가 되어 대비가 1.04 까지 떨어진다.
+   같은 이유로 이 아래 어느 규칙도 --g-bg-2 를 쓰지 않는다.
+
+   수치는 React Flow 원본을 글자 크기 기준 2배로 키운 값이다.
+   글자 12→24, 안쪽 여백 10→20, 점 간격 20→40, 점 지름 1→2, 선 두께 1→2.
+   테두리 두께와 모서리 반경만 저장소 규칙(1px, 0.5rem)을 따른다. */
+.reveal .flow {
+  --flow-dot: rgba(160, 136, 255, 0.08);   /* 상한 0.08 — 더 진하면 글자 뒤 대비를 깎는다 */
+  --flow-line: var(--g-muted);
+  position: relative;
+  /* box-sizing 을 border-box 로 두면 안 된다. 인라인 높이에서 테두리 2px 를 빼앗아
+     안쪽 칸이 도식보다 2px 낮아지고, 기본 배율에서도 세로로 밀 수 있게 된다.
+     여기서 인라인 높이는 "안쪽 칸의 높이"를 뜻하며 도식 높이와 같아야 한다. */
+  box-sizing: content-box;
+  overflow: hidden;                        /* 확대한 도식이 슬라이드로 번지지 않게 자른다 */
+  padding: 0;                              /* 껍데기는 높이만 정한다. 여백은 안의 내용이 갖는다 */
+  border: 1px solid var(--g-border);
+  border-radius: 0.5rem;
+  user-select: none;                       /* 끌 때 글자가 선택되지 않게 */
+  background-image: radial-gradient(circle, var(--flow-dot) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+:root.light .reveal .flow { --flow-dot: rgba(66, 19, 255, 0.08); }
+
+/* 조작이 켜진 동안에만 손가락 기본 동작을 가져온다.
+   항상 켜 두면 좁은 화면(발표 폭 435px 이하)에서 세로 스크롤이 막힌다. */
+.reveal .flow.is-live { touch-action: none; }
+.reveal .flow.is-pannable { cursor: grab; }
+.reveal .flow.is-dragging { cursor: grabbing; }
+
+.reveal .flow-canvas {
+  position: relative;
+  transform-origin: 0 0;
+  /* translate 먼저, scale 나중. 순서를 뒤집으면 밀기 속도가 배율만큼 어긋난다. */
+  transform: translate(0, 0) scale(1);
+}
+/* 끄는 중에는 전환을 빼야 손가락을 따라온다. */
+.reveal .flow:not(.is-dragging) .flow-canvas { transition: transform 0.18s ease; }
+
+.reveal .flow-node {
+  position: absolute;                      /* 자리는 left/top 으로만 준다 — transform 은 등장 효과와 충돌한다 */
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--g-border);
+  border-radius: 0.5rem;
+  background: var(--g-card);
+  font-size: 24px;
+  line-height: 1.5;
+  word-break: keep-all;                    /* 저장소 최초 도입 — 없으면 좁은 상자에서 어절 중간이 끊긴다 */
+}
+.reveal .flow-node .flow-file { color: var(--g-link); }
+.reveal .flow-node .flow-desc { display: block; font-size: 20px; color: var(--g-muted); }
+/* 판단 단계는 마름모 대신 테두리 색으로 구분한다. 글자 상자로 마름모를 만들면 배치가 어색해진다. */
+.reveal .flow-node.is-decision { border-color: var(--g-accent); }
+
+.reveal .flow-edges {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.reveal .flow-edges path { fill: none; stroke: var(--flow-line); stroke-width: 2; }
+/* 화살촉은 위 규칙의 fill: none 에 걸리면 안 보인다. 더 좁은 선택자로 되돌린다. */
+.reveal .flow-edges marker path { fill: var(--flow-line); stroke: none; }
+
+/* 연결선 이름표. 그림 안 글자는 대비 검사가 못 재므로 글자 상자로 만든다.
+   배경을 깔아 선이 글자를 가로지르지 않게 한다 — 전에 쓰던 mermaid 도 같은 방식이었다. */
+.reveal .flow-label {
+  position: absolute;
+  padding: 0 6px;
+  background: var(--g-bg);
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--g-muted);
+  white-space: nowrap;
+}
+
+/* 열 위에 붙는 무리 이름. 계층을 색과 자리로만 나타내면 낭독기에 전달되지 않는다. */
+.reveal .flow-group {
+  position: absolute;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--g-accent);
+}
+
+/* ── 덮임 그림 전용 (막대 트랙) ──
+   이 도식에는 그림(SVG)을 한 조각도 쓰지 않는다. 막대와 눈금선까지 전부 글자 상자다. */
+.reveal .flow-title { position: absolute; font-size: 24px; line-height: 1.5; }
+.reveal .flow-track { position: absolute; height: 30px; }
+.reveal .flow-track-name {
+  position: absolute; left: 0; width: 148px;
+  font-size: 20px; line-height: 30px; text-align: right; color: var(--g-muted);
+}
+.reveal .flow-bar {
+  position: absolute; top: 1px; height: 28px;
+  border-radius: 0.25rem; background: var(--g-accent);
+}
+.reveal .flow-bar.is-total { background: var(--g-link); }
+/* 덮이지 않은 구간은 색을 비우고 테두리만 남긴다 */
+.reveal .flow-bar.is-gap { background: none; border: 1px dashed var(--g-pink); }
+.reveal .flow-axis {
+  position: absolute; height: 1px; background: var(--g-border);
+}
+.reveal .flow-tick {
+  position: absolute; font-size: 20px; line-height: 1.5; color: var(--g-muted);
+}
+
+/* ── 조작 단추 ──
+   껍데기 안에 두되 겹쳐 띄운다. 그래야 도식 높이 한도를 잡아먹지 않는다.
+   초점 표시는 랜딩 카드(galaxy.css)와 같은 값으로 맞춘다. */
+.reveal .flow-controls {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.reveal .flow-controls button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--g-border);
+  border-bottom-width: 0;
+  background: var(--g-card);
+  color: var(--g-text);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.reveal .flow-controls button:first-child { border-radius: 0.5rem 0.5rem 0 0; }
+.reveal .flow-controls button:last-child {
+  border-bottom-width: 1px;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+.reveal .flow-controls button:hover {
+  background: var(--g-card-hover);
+  border-color: var(--g-accent);
+}
+.reveal .flow-controls button:focus-visible {
+  outline: 2px solid var(--g-link);
+  outline-offset: 3px;
+}
+/* 조작이 꺼진 상태에서는 단추도 감춘다. 눌러도 소용없는 단추는 오해를 준다.
+   해당 상황은 전체 보기, 발표 폭 435px 이하, 발표자 화면, 인쇄 네 가지다. */
+.reveal .flow:not(.is-live) .flow-controls { display: none; }
+
+/* 화면 낭독기 전용 문장. 상자 사이 관계는 선으로만 표현되어 소리로 전달되지 않는다. */
+.reveal .flow-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 /* 두 칸 배치 */
 .reveal .cols {
@@ -211,6 +369,9 @@ section.slow-one   .rise { --step: 0s;   --lead: 1.2s; }
   .reveal .slides section > * { transition: none !important; animation: none !important; }
   /* 위 규칙은 직계 자식만 잡는다. 등장 대상은 그보다 안쪽에 있을 수 있어 따로 끈다. */
   .reveal .rise { animation: none !important; }
+  /* 도식도 직계 자식보다 깊다. 위 두 규칙 중 어느 것도 이 전환을 못 잡는다.
+     기능(밀기·확대)은 그대로 두고 부드럽게 변하는 전환만 끈다 — 규격이 그렇게 나눈다. */
+  .reveal .flow-canvas { transition: none !important; }
 }
 
 /* PDF 내보내기 (해소 17번).
@@ -237,4 +398,11 @@ section.slow-one   .rise { --step: 0s;   --lead: 1.2s; }
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+
+  /* 살아 있는 화면에서 Ctrl+P 를 누르면 reveal 이 아무 신호도 주지 않는다.
+     그래서 확대·이동을 여기서 강제로 되돌린다. 코드가 요소에 직접 넣은 값이
+     파일 규칙보다 세므로 !important 없이는 진다. */
+  .reveal .flow-canvas { transform: none !important; transition: none !important; }
+  .reveal .flow { background-position: 0 0 !important; }
+  .reveal .flow-controls { display: none !important; }
 }
