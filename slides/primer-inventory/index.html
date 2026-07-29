@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -13,11 +13,11 @@
   <link rel="stylesheet" href="../vendor/reveal/theme/black.css">
   <link rel="stylesheet" href="../vendor/reveal/plugin/highlight/monokai.css">
   <!-- 갤럭시 색은 반드시 기본 테마 뒤에 온다 -->
-  <link rel="stylesheet" href="../../assets/galaxy.css">
-  <link rel="stylesheet" href="../../assets/galaxy-reveal.css">
+  <link rel="stylesheet" href="../../assets/absci.css">
+  <link rel="stylesheet" href="../../assets/absci-reveal.css">
 
   <!-- ================================================================
-       이 덱 전용 스타일. 공용 파일(galaxy*.css, starfield.js)은 건드리지 않는다.
+       이 덱 전용 스타일. 공용 파일(galaxy*.css, absci-bg.js)은 건드리지 않는다.
        고치면 첫 화면과 견본 덱까지 바뀌기 때문이다.
        색과 움직임은 euiyun.com 세미나 덱을 참고했다.
        ================================================================ -->
@@ -55,8 +55,8 @@
 </head>
 <body>
 <!-- 별 배경 위에 얹는 두 겹. 색 얼룩과 옅은 격자다. -->
-<div class="sky-glow" aria-hidden="true"></div>
-<div class="sky-grid" aria-hidden="true"></div>
+
+
 <div class="reveal">
   <div class="slides">
 
@@ -823,7 +823,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
 <script src="../vendor/reveal/reveal.js"></script>
 <script src="../vendor/reveal/plugin/highlight.js"></script>
 <script src="../vendor/reveal/plugin/notes.js"></script>
-<script src="../../assets/starfield.js"></script>
+<script src="../../assets/absci-bg.js"></script>
 <script>
 (function () {
   'use strict';

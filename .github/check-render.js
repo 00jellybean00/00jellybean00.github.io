@@ -1,4 +1,4 @@
-/* 브라우저로 실제 그려 본 뒤에야 드러나는 것들을 잡는다.  실행: node .github/check-render.js
+﻿/* 브라우저로 실제 그려 본 뒤에야 드러나는 것들을 잡는다.  실행: node .github/check-render.js
  *
  * check-links.js 는 파일이 있는지, 문법이 맞는지만 본다.
  * 그 검사를 전부 통과하고도 조용히 죽어 있던 결함이 2026-07-27 에 네 건 나왔다.
@@ -21,7 +21,7 @@ const DECKS = ['slides/primer-inventory/', 'slides/demo/'];
 // 발표 도구가 없는 페이지. 검사 5(대비비)와 7(움직임 줄이기)만 돌 수 있다.
 const PLAIN_PAGES = ['index.html'];
 // 공용 스타일. 색이 여기로 옮겨 온 뒤로는 화면 파일만 세면 놓친다.
-const SHARED_CSS = ['assets/galaxy.css', 'assets/galaxy-reveal.css'];
+const SHARED_CSS = ['assets/absci.css', 'assets/absci-reveal.css'];
 const PORT = 8731;
 
 const fails = [];
@@ -36,7 +36,7 @@ function serve() {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
       let p = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]));
-      if (p.endsWith('/')) p = path.join(p, 'index.html');
+      if (p.endsWith('/') || p.endsWith('\\')) p = path.join(p, 'index.html');
       fs.readFile(p, (err, data) => {
         if (err) { res.writeHead(404); res.end(); return; }
         res.writeHead(200, { 'Content-Type': MIME[path.extname(p)] || 'application/octet-stream' });
@@ -91,6 +91,9 @@ async function checkDeck(browser, deck) {
 
   // ── 검사 1: 내가 쓴 CSS 규칙이 전부 살아 있는가 ────────────────
   const authored = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => countAuthoredRules(m[1]));
+  page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+  page.on('response', response => { if (response.status() === 404) console.log('404 URL:', response.url()); });
+  page.on('pageerror', err => console.log('PAGE ERROR:', err));
   await page.goto(base + '?render-check');
   await page.waitForFunction('window.Reveal && Reveal.isReady()', null, { timeout: 15000 });
   await page.waitForTimeout(600);
@@ -330,3 +333,6 @@ async function checkSharedCss(browser) {
   }
   console.log(`화면 렌더링 검사: PASS (발표자료 ${DECKS.length} · 일반 페이지 ${PLAIN_PAGES.length} · 공용 스타일 ${SHARED_CSS.length})`);
 })();
+
+
+

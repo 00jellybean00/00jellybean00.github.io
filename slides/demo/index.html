@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -13,13 +13,10 @@
   <link rel="stylesheet" href="../vendor/reveal/theme/black.css">
   <link rel="stylesheet" href="../vendor/reveal/plugin/highlight/monokai.css">
   <!-- 갤럭시 색은 반드시 기본 테마 뒤에 온다 -->
-  <link rel="stylesheet" href="../../assets/galaxy.css">
-  <link rel="stylesheet" href="../../assets/galaxy-reveal.css">
+  <link rel="stylesheet" href="../../assets/absci.css">
+  <link rel="stylesheet" href="../../assets/absci-reveal.css">
 </head>
 <body>
-<!-- 별 배경 위에 얹는 두 겹. 색 얼룩과 옅은 격자다. 규칙은 assets/galaxy.css 에 있다. -->
-<div class="sky-glow" aria-hidden="true"></div>
-<div class="sky-grid" aria-hidden="true"></div>
 <div class="reveal">
   <div class="slides">
 
@@ -211,7 +208,7 @@ flowchart LR
 <script src="../vendor/reveal/plugin/notes.js"></script>
 <!-- mermaid는 3.4MB라 여기서 미리 부르지 않는다. 다이어그램이 있을 때만 불러온다. -->
 <script src="../vendor/chart/chart.umd.min.js"></script>
-<script src="../../assets/starfield.js"></script>
+<script src="../../assets/absci-bg.js"></script>
 <script>
 (function () {
   'use strict';
@@ -226,7 +223,7 @@ flowchart LR
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   Reveal.initialize({
-    // 화면 크기와 기준 글자 크기는 짝이다. 기준 글자 48 은 galaxy-reveal.css 에 있다.
+    // 화면 크기와 기준 글자 크기는 짝이다. 기준 글자 48 은 absci-reveal.css 에 있다.
     // 이 둘 중 하나만 바꾸면 글자가 화면에 비해 크거나 작아진다.
     width: 1280,
     height: 800,

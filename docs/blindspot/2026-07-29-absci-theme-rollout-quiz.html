@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Pre-Merge Quiz: absci-theme-rollout</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; background: #0e0e0e; color: #dedede; }
+    .question { margin-bottom: 20px; padding: 20px; background: #1e1e1e; border-radius: 8px; }
+    h1 { color: #fcfcfb; }
+    label { display: block; margin: 8px 0; }
+    button { margin-top: 20px; padding: 10px 20px; background: #38bdf8; color: #000; border: none; border-radius: 4px; cursor: pointer; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Pre-Merge Quiz: absci-theme-rollout</h1>
+  <form id="quiz">
+    <div class="question">
+      <p>1. 이번 테마 변경에서 배경 구현 방식은 어떻게 달라졌나요?</p>
+      <label><input type="radio" name="q1" value="wrong"> JS로 Canvas 렌더링</label>
+      <label><input type="radio" name="q1" value="correct"> CSS linear-gradient 애니메이션을 html 요소에 적용</label>
+      <label><input type="radio" name="q1" value="wrong"> CSS로 별과 구름 애니메이션 적용</label>
+    </div>
+    <div class="question">
+      <p>2. 라이트 모드(?light) 적용 시 가독성을 유지하기 위한 조치는 무엇인가요?</p>
+      <label><input type="radio" name="q2" value="wrong"> 글씨체 크기를 두 배로 키움</label>
+      <label><input type="radio" name="q2" value="wrong"> 백그라운드를 완전히 제거함</label>
+      <label><input type="radio" name="q2" value="correct"> CSS 상속을 이용해 --g-scrim과 텍스트 색상을 반전시켜 가독성을 확보함</label>
+    </div>
+    <div class="question">
+      <p>3. 기존에 사용되던 별/구름용 HTML 태그인 .sky-glow 와 .sky-grid 는 어떻게 처리되었나요?</p>
+      <label><input type="radio" name="q3" value="wrong"> display: none 처리</label>
+      <label><input type="radio" name="q3" value="correct"> HTML 파일에서 완전히 제거됨</label>
+      <label><input type="radio" name="q3" value="wrong"> opacity: 0 처리</label>
+    </div>
+    <button type="button" onclick="check()">제출</button>
+  </form>
+  <div id="result" class="result"></div>
+  <script>
+    function check() {
+      const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+      const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+      const q3 = document.querySelector('input[name="q3"]:checked')?.value;
+      
+      if (q1 === "correct" && q2 === "correct" && q3 === "correct") {
+        document.getElementById("result").innerText = "통과! 머지해도 좋습니다.";
+        document.getElementById("result").style.color = "#4ade80";
+      } else {
+        document.getElementById("result").innerText = "틀린 답이 있습니다. 다시 확인하세요.";
+        document.getElementById("result").style.color = "#f87171";
+      }
+    }
+  </script>
+</body>
+</html>

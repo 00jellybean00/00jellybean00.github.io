@@ -41,7 +41,7 @@
    지켜야 할 순서:  별 캔버스(0)  <  이 어둠 막(1)  <  슬라이드 본문(10)
    처음에는 z-index를 -1로 뒀다가 어둠 막이 별보다 아래로 내려가,
    별을 전혀 가리지 못했다. 이 값을 0 이하로 내리면 같은 문제가 재발한다.
-   (별 캔버스 z-index는 galaxy.css, 본문 z-index 10은 reveal.css에서 정한다) */
+   (배경 그라데이션 z-index는 absci.css, 본문 z-index 10은 reveal.css에서 정한다) */
 .reveal-viewport::before {
   content: "";
   position: fixed;
@@ -188,7 +188,7 @@
 .reveal pre code          { color: #E2E6F0; }   /* 상자 안 기본 글자도 고정 */
 
 /* ── 등장 움직임 (발표 화면 안) ─────────────────────────────
-   나타나는 모양과 지연 계산은 galaxy.css 에 있다. 여기서는 걸리는 조건만 정한다.
+   나타나는 모양과 지연 계산은 absci.css 에 있다. 여기서는 걸리는 조건만 정한다.
 
    :not(.stack)   — 부록이 달린 슬라이드는 부모 껍데기에도 .present 가 붙는다.
                     안 빼면 부록 슬라이드가 통째로 밀려 올라온다.
