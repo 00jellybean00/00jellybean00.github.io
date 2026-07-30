@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Pre-Merge Quiz: image-only-slides</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; background: #0e0e0e; color: #dedede; }
+    .question { margin-bottom: 20px; padding: 20px; background: #1e1e1e; border-radius: 8px; }
+    h1 { color: #fcfcfb; }
+    label { display: block; margin: 8px 0; }
+    button { margin-top: 20px; padding: 10px 20px; background: #38bdf8; color: #000; border: none; border-radius: 4px; cursor: pointer; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Pre-Merge Quiz: image-only-slides</h1>
+  <form id="quiz">
+    <div class="question">
+      <p>1. 슬라이드 내용의 텍스트가 시각자료로 교체되면서 발생할 수 있는 정보 누락을 어떻게 방지했습니까?</p>
+      <label><input type="radio" name="q1" value="wrong"> 별도의 PDF 문서를 제공함</label>
+      <label><input type="radio" name="q1" value="correct"> 원본 텍스트 전체를 발표자 대본(aside class="notes")으로 이동시킴</label>
+      <label><input type="radio" name="q1" value="wrong"> 텍스트를 작게 줄여 구석에 배치함</label>
+    </div>
+    <div class="question">
+      <p>2. primer-inventory 슬라이드의 파이썬 코드 블록은 무엇으로 대체되었습니까?</p>
+      <label><input type="radio" name="q2" value="wrong"> 파이썬 코드 동작 화면 녹화 영상</label>
+      <label><input type="radio" name="q2" value="wrong"> 아무 것으로도 대체되지 않음</label>
+      <label><input type="radio" name="q2" value="correct"> 분기 조건 등을 직관적으로 보여주는 Mermaid 다이어그램(순서도 등)</label>
+    </div>
+    <div class="question">
+      <p>3. demo 발표 자료의 표 요소는 어떻게 변경되었습니까?</p>
+      <label><input type="radio" name="q3" value="wrong"> 이미지 파일로 캡처하여 삽입</label>
+      <label><input type="radio" name="q3" value="correct"> Chart.js를 이용한 막대 그래프로 대체</label>
+      <label><input type="radio" name="q3" value="wrong"> 표의 테두리를 없애고 텍스트만 남김</label>
+    </div>
+    <button type="button" onclick="check()">제출</button>
+  </form>
+  <div id="result" class="result"></div>
+  <script>
+    function check() {
+      const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+      const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+      const q3 = document.querySelector('input[name="q3"]:checked')?.value;
+      
+      if (q1 === "correct" && q2 === "correct" && q3 === "correct") {
+        document.getElementById("result").innerText = "합격! 머지를 승인합니다.";
+        document.getElementById("result").style.color = "#4ade80";
+      } else {
+        document.getElementById("result").innerText = "틀린 문항이 있습니다. 다시 확인하세요.";
+        document.getElementById("result").style.color = "#f87171";
+      }
+    }
+  </script>
+</body>
+</html>

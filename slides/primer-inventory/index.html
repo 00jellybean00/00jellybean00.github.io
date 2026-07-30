@@ -80,14 +80,24 @@
     <!-- 2 -->
     <section>
       <h2>지금은 매번 손으로 찾습니다</h2>
-      <ul>
-        <li class="rise" style="--i:0">확인할 구간이 생기면 보관 중인 primer 목록을 하나씩 훑습니다</li>
-        <li class="rise" style="--i:1">각 primer가 그 근처에 붙는지, 어느 방향인지 눈으로 확인합니다</li>
-        <li class="rise" style="--i:2">몇 개를 보내야 구간이 다 읽히는지는 종이에 그려 가며 셉니다</li>
-        <li class="rise" style="--i:3">primer가 수십 개가 되면 이 일이 오래 걸립니다</li>
-      </ul>
-      <p class="muted" style="font-size: 0.55em">그리고 이미 있는 primer를 못 찾아서 새로 주문하는 일이 생깁니다.</p>
+      <div class="figure">
+        <pre class="mermaid">
+flowchart LR
+    A[확인 구간 발생] --> B[primer 목록<br>하나씩 확인]
+    B --> C{결합 여부 및<br>방향 확인}
+    C -- 맞음 --> D[종이에 그리며<br>필요 수량 계산]
+    C -- 안맞음 --> B
+    D --> E[수십 개면<br>시간 소요 큼]
+    E -. 못 찾으면 .-> F[새로 주문<br>중복 비용 발생]
+        </pre>
+      </div>
       <aside class="notes">
+        [원문]<br>
+        · 확인할 구간이 생기면 보관 중인 primer 목록을 하나씩 훑습니다<br>
+        · 각 primer가 그 근처에 붙는지, 어느 방향인지 눈으로 확인합니다<br>
+        · 몇 개를 보내야 구간이 다 읽히는지는 종이에 그려 가며 셉니다<br>
+        · primer가 수십 개가 되면 이 일이 오래 걸립니다<br>
+        · 그리고 이미 있는 primer를 못 찾아서 새로 주문하는 일이 생깁니다.<br><br>
         <b>진짜 손해는 시간이 아니라 중복 주문</b><br>
         · 손으로 훑으면 오래 걸린다<br>
         · 못 찾아 새로 주문하는 게 더 큼<br>
@@ -100,15 +110,27 @@
     <!-- 3 -->
     <section>
       <h2>명령 한 줄이면 끝납니다</h2>
-      <pre style="font-size: 0.42em"><code class="language-bash" data-trim><script type="text/template">
+      <pre style="font-size: 0.42em; margin-bottom: 0.5em;"><code class="language-bash" data-trim><script type="text/template">
 uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circular
 </script></code></pre>
-      <ul style="font-size: 0.85em">
-        <li class="rise" style="--i:0">쓸 만한 primer를 순위대로 — 보관 위치와 원래 용도까지</li>
-        <li class="rise" style="--i:1">목표 구간이 어디까지 덮이는지 그림으로</li>
-        <li class="rise" style="--i:2">안 덮이는 자리가 남으면 새 primer 후보까지 설계</li>
-      </ul>
+      <div class="figure">
+        <pre class="mermaid">
+mindmap
+  root((primer-pick))
+    추천 결과 목록
+      순위 제공
+      보관 위치 / 용도 포함
+    커버리지 시각화
+      목표 구간 덮임 그림
+    새 primer 설계
+      빈 구간용 후보 설계
+        </pre>
+      </div>
       <aside class="notes">
+        [원문]<br>
+        · 쓸 만한 primer를 순위대로 — 보관 위치와 원래 용도까지<br>
+        · 목표 구간이 어디까지 덮이는지 그림으로<br>
+        · 안 덮이는 자리가 남으면 새 primer 후보까지 설계<br><br>
         <b>입력은 파일 둘, 구간 지정은 세 방법</b><br>
         · 서열 파일 + primer 목록<br>
         · 위치 번호 / feature / 서열 조각<br>
@@ -123,25 +145,27 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
     <!-- 4 -->
     <section>
       <h2>실행 화면 ① 추천 목록</h2>
-      <pre style="font-size: 0.420em"><code class="language-plaintext" data-trim><script type="text/template">
-대상 서열: pDEMO-1 (2,620 bp, 고리 모양)
-목표 구간: 1,261~2,160번 (900 bp)
-판독 설정: primer 뒤 100글자는 버리고 400글자를 읽음 [conservative — Azenta 안내 최적 구간 100~500번]
-
-추천 primer (5개)
-  #  이름     위치   방향    덮음  거리  Tm    꼬리  보관 위치  용도
-  -----------------------------------------------------------------------------------------
-  1  CLONE-F  1,420  정방향  400   0     51.7  14    Box3-A1    클로닝용 (5' 제한효소 자리)
-  2  INS-F2   1,620  정방향  400   0     52.1  -     Box2-C4    insert 중간 확인
-  3  INS-R1   2,101  역방향  400   0     65.3  -     Box2-D2    insert 뒤쪽 확인 (역방향)
-  4  INS-F1   1,170  정방향  400   91    69.3  -     Box1-B1    insert 앞쪽 확인
-  5  M13-F    1,020  정방향  260   241   63.3  -     Box1-A3    범용 시퀀싱
-</script></code></pre>
-      <p class="muted" style="font-size: 0.5em">
-        예시 데이터는 시험용으로 만든 합성 서열입니다. 이름은 흔한 primer 이름을 빌렸을 뿐 실제 서열이 아닙니다.<br>
-        이 아래에 추천 이유 안내 5줄이 더 나옵니다. 그 부분은 판정 기준 대목에서 보시겠습니다.
-      </p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart TB
+  subgraph Input [분석 조건]
+    A[대상 서열: pDEMO-1]
+    B[목표 구간: 1,261~2,160]
+    C[판독: 앞 100 버림 / 400 읽음]
+  end
+  subgraph Output [추천 primer Top 5]
+    D[1. CLONE-F: 400 덮음 / Box3-A1]
+    E[2. INS-F2: 400 덮음 / Box2-C4]
+    F[3. INS-R1: 400 덮음 / Box2-D2]
+    G[4. INS-F1: 400 덮음 / Box1-B1]
+    H[5. M13-F: 260 덮음 / Box1-A3]
+  end
+  Input --> Output
+        </pre>
+      </div>
       <aside class="notes">
+        [터미널 원문 생략됨]<br>
+        예시 데이터는 시험용 합성 서열입니다.<br><br>
         <b>꼬리는 primer 앞의 여분 서열</b><br>
         · CLONE-F는 제한효소 자리 14글자<br>
         · 안 붙지만 뒤 13글자가 맞아 씀<br>
@@ -155,25 +179,26 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
     <!-- 5 -->
     <section>
       <h2>실행 화면 ② 덮임 그림</h2>
-      <pre style="font-size: 0.416em"><code class="language-plaintext" data-trim><script type="text/template">
-커버리지 — primer 3개로 목표 900 bp 중 860 bp (96%)를 덮습니다
-           1,261                                                  2,160
-  M13-F    >=================
-  CLONE-F                   >==========================
-  INS-F2                                 >===========================
-           ------------------------------------------------------------
-  합계     #########################################################...
-
-  덮이지 않은 구간 1곳:
-    2,121~2,160번 (40 bp)
-    --read-length 를 늘리거나 이 구간에 새 primer가 필요합니다.
-  M13-F과 CLONE-F의 판독 구간이 0 bp만 겹칩니다 (권장 20 bp 이상). 이음매 부근 결과를 믿기 어렵습니다.
-  가장 적은 조합에 가깝게 고른 것이며, 이론상 최소는 아닐 수 있습니다.
-</script></code></pre>
-      <p class="muted" style="font-size: 0.5em">
-        96%는 근사가 아니라 정확한 최댓값입니다. 근사인 것은 <strong>primer 개수</strong>뿐입니다.
-      </p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+gantt
+    title 커버리지 (목표 900bp 중 860bp 덮음 - 96%)
+    dateFormat X
+    axisFormat %s
+    section M13-F
+    260bp 덮음: 1261, 1521
+    section CLONE-F
+    400bp 덮음: 1520, 1920
+    section INS-F2
+    400bp 덮음: 1720, 2120
+    section 빈 구간
+    40bp 미달: done, 2120, 2160
+        </pre>
+      </div>
       <aside class="notes">
+        [원문]<br>
+        M13-F과 CLONE-F의 판독 구간이 0 bp만 겹칩니다 (권장 20 bp 이상). 이음매 부근 결과를 믿기 어렵습니다.<br>
+        96%는 근사가 아니라 정확한 최댓값입니다. 근사인 것은 primer 개수뿐입니다.<br><br>
         <b>96%는 근사가 아니라 정확한 최댓값</b><br>
         · 더 넣을 게 없을 때 멈춤<br>
         · 근사인 건 primer 개수뿐<br>
@@ -187,28 +212,21 @@ uv run primer-pick -t 서열파일 -p primer목록.csv --region 1261-2160 --circ
     <!-- 6 -->
     <section>
       <h2>실행 화면 ③ 제외와 새 설계</h2>
-      <pre style="font-size: 0.437em"><code class="language-plaintext" data-trim><script type="text/template">
-여러 곳에 결합해 제외 (1개)
-  TERM-X: 이 서열의 2곳(1,240번, 2,200번)에 결합합니다. 시퀀싱 결과가 겹쳐 나와 읽을 수 없습니다.
-  primer 자체의 문제가 아니라 이 서열과 맞지 않는 것입니다.
-
-새 primer 설계 — 덮이지 않은 구간 1곳
-  2,121~2,160번 (40 bp) — primer 1개가 필요합니다
-    자리 1: 2,121~2,160번
-      정방향  CATCGACGCCTTGTGTAC  18 bp  Tm 55.9도  GC 56%  3' 끝 2,005번  GC 끝맺음
-        걸린 후보: 녹는점이 범위 밖 107개, GC 비율이 범위 밖 38개, 자기들끼리 붙거나 접힘 8개
-      역방향  조건을 통과한 후보가 없습니다
-        걸린 후보: 녹는점이 범위 밖 143개, GC 비율이 범위 밖 125개, 자기들끼리 붙거나 접힘 2개
-
-  설계한 primer는 화면에만 나옵니다. 목록 파일에 넣지 않습니다.
-  실제로 주문한 뒤에 직접 목록에 적으십시오.
-
-primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 않아 표시하지 않았습니다.
-</script></code></pre>
-      <p class="muted" style="font-size: 0.5em">
-        제외 사유는 세 가지입니다 — 여러 곳에 붙음 / 유일한 자리가 너무 약함 / 목표를 못 덮음.
-      </p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart LR
+    A[빈 구간 발생<br>40 bp] --> B{새 primer 설계}
+    B -- 정방향 --> C[18 bp, Tm 55.9도<br>GC 56%]
+    B -- 역방향 --> D[조건 통과 후보 없음]
+    E[기존 재고 검사] --> F{제외 사유}
+    F -- 다중 결합 --> G[결과 겹침]
+    F -- 결합력 약함 --> H[유일한 자리 약함]
+    F -- 위치 불량 --> I[목표 구간 못 덮음]
+        </pre>
+      </div>
       <aside class="notes">
+        [터미널 원문 생략됨]<br>
+        제외 사유는 세 가지입니다 — 여러 곳에 붙음 / 유일한 자리가 너무 약함 / 목표를 못 덮음.<br><br>
         <b>제외 사유는 셋입니다</b><br>
         · 여러 곳에 붙음<br>
         · 유일한 자리가 너무 약함<br>
@@ -225,16 +243,32 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
     <section class="hero">
       <h1>무엇으로 판정하는가</h1>
       <p class="tagline">숫자 네 개가 결과를 정합니다</p>
-      <table style="font-size: 0.62em; margin-top: 1em">
-        <thead><tr><th>기준</th><th>값</th><th>뜻</th></tr></thead>
-        <tbody>
-          <tr><td>결합 판정 길이</td><td>13글자</td><td>primer 3' 끝 13글자가 정확히 맞아야 붙었다고 봄</td></tr>
-          <tr><td>결합부 최소 Tm</td><td>40도</td><td>실제 붙는 부분의 Tm이 이보다 낮으면 버림</td></tr>
-          <tr><td>판독 구간</td><td>100 / 400</td><td>primer 뒤 100글자는 못 읽고 그다음 400글자를 읽음</td></tr>
-          <tr><td>최소 겹침</td><td>20글자</td><td>이웃한 두 판독 구간이 이만큼은 겹쳐야 이음매를 믿음</td></tr>
-        </tbody>
-      </table>
+    <!-- 7 -->
+    <section class="hero">
+      <h1>무엇으로 판정하는가</h1>
+      <p class="tagline">숫자 네 개가 결과를 정합니다</p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart LR
+  A(4가지 판정 기준) --> B[결합 판정 길이: 13글자]
+  A --> C[결합부 최소 Tm: 40도]
+  A --> D[판독 구간: 100 / 400]
+  A --> E[최소 겹침: 20글자]
+        </pre>
+      </div>
       <aside class="notes">
+        [원문 표 내용]<br>
+        결합 판정 길이: 13글자 (primer 3' 끝 13글자가 정확히 맞아야 붙었다고 봄)<br>
+        결합부 최소 Tm: 40도 (실제 붙는 부분의 Tm이 이보다 낮으면 버림)<br>
+        판독 구간: 100 / 400 (primer 뒤 100글자는 못 읽고 그다음 400글자를 읽음)<br>
+        최소 겹침: 20글자 (이웃한 두 판독 구간이 이만큼은 겹쳐야 이음매를 믿음)<br><br>
+        <b>네 숫자 모두 옵션으로 바꿉니다</b><br>
+        · 하드코딩이 아닌 기본값<br>
+        · 근거 강한 것부터 말씀드립니다<br>
+        <br>
+        가장 확실한 둘부터.
+      </aside>
+    </section>
         <b>네 숫자 모두 옵션으로 바꿉니다</b><br>
         · 하드코딩이 아닌 기본값<br>
         · 근거 강한 것부터 말씀드립니다<br>
@@ -246,20 +280,32 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
     <!-- 8 -->
     <section>
       <h2>근거가 확실한 쪽부터</h2>
-      <div class="cols">
-        <div>
-          <h3 style="font-size: 0.7em">겹침 20글자</h3>
-          <p style="font-size: 0.62em">읽은 조각을 이어 붙이는 표준 프로그램 <strong>Sequencher</strong>의 기본값과 정확히 같습니다.</p>
-          <p class="muted" style="font-size: 0.52em">다만 프로그램마다 다릅니다. CAP3는 기본값이 40입니다. 그 사실도 함께 말씀드립니다.</p>
-        </div>
-        <div>
-          <h3 style="font-size: 0.7em">판독 50 / 500</h3>
-          <p style="font-size: 0.62em">중간 설정 값입니다. 출처는 어느 연구실 실험 절차서인데, <strong>Primer3</strong>의 시퀀싱 기본값과도 정확히 같습니다.</p>
-          <p class="muted" style="font-size: 0.52em">서로 다른 두 출처가 같은 숫자에 닿았습니다.</p>
-        </div>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((판정 기준 근거))
+    겹침 20글자
+      표준 프로그램 Sequencher 기본값 일치
+      (참고: CAP3는 기본값 40)
+    판독 50 / 500
+      연구실 실험 절차서 기준
+      Primer3 시퀀싱 기본값 일치
+        </pre>
       </div>
-      <p class="cite" style="margin-top: 0.8em">Sequencher 4.8 매뉴얼 · Primer3 web help (PRIMER_SEQUENCING_LEAD 50 / SPACING 500)</p>
       <aside class="notes">
+        [원문]<br>
+        겹침 20글자: 읽은 조각을 이어 붙이는 표준 프로그램 Sequencher의 기본값과 정확히 같습니다. 다만 프로그램마다 다릅니다. CAP3는 기본값이 40입니다. 그 사실도 함께 말씀드립니다.<br>
+        판독 50 / 500: 중간 설정 값입니다. 출처는 어느 연구실 실험 절차서인데, Primer3의 시퀀싱 기본값과도 정확히 같습니다. 서로 다른 두 출처가 같은 숫자에 닿았습니다.<br>
+        출처: Sequencher 4.8 매뉴얼 · Primer3 web help (PRIMER_SEQUENCING_LEAD 50 / SPACING 500)<br><br>
+        <b>이 둘은 외부 표준과 정확히 일치</b><br>
+        · 겹침 20 = Sequencher 기본값<br>
+        · 50/500 = Primer3 기본값과도 같음<br>
+        · 서로 다른 두 출처가 같은 값<br>
+        [Q] 업체는 700~1050? → 세는 기준이 다름<br>
+        <br>
+        그런데 기본값은 더 좁습니다.
+      </aside>
+    </section>
         <b>이 둘은 외부 표준과 정확히 일치</b><br>
         · 겹침 20 = Sequencher 기본값<br>
         · 50/500 = Primer3 기본값과도 같음<br>
@@ -273,18 +319,30 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
     <!-- 9 -->
     <section class="slow-one">
       <h2>그런데 기본값은 더 보수적입니다</h2>
-      <p style="font-size: 0.8em">기본값은 <strong>100 버리고 400 읽기</strong>입니다. 근거가 가장 강한 50/500보다 좁습니다.</p>
-      <div style="font-size: 0.62em; margin: 0.6em 0">
-        <table>
-          <thead><tr><th>실수</th><th>결과</th><th>비용</th></tr></thead>
-          <tbody>
-            <tr><td>잘못 "읽힌다"고 함</td><td>보냈는데 안 읽힘</td><td>실험을 다시 함</td></tr>
-            <tr><td>잘못 "안 읽힌다"고 함</td><td>primer 하나를 더 씀</td><td>목록에서 하나 더 꺼냄</td></tr>
-          </tbody>
-        </table>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart TD
+  A{도구의 실수} -- 잘못 읽힌다고 함 --> B[보냈는데 안 읽힘] --> C[비용 큼: 실험 재수행]
+  A -- 잘못 안 읽힌다고 함 --> D[primer 하나 더 씀] --> E[비용 작음: 재고 추가 인출]
+  C -. 안전한 쪽으로 기울임 .-> F[보수적 기준 채택:<br>100 버리고 400 읽기]
+  E -. 안전한 쪽으로 기울임 .-> F
+        </pre>
       </div>
-      <p class="rise" style="--i:0;font-size: 0.72em">두 실수의 비용이 다릅니다. 그래서 안전한 쪽으로 기울였습니다.</p>
       <aside class="notes">
+        [원문]<br>
+        기본값은 100 버리고 400 읽기입니다. 근거가 가장 강한 50/500보다 좁습니다.<br>
+        잘못 읽힌다 -> 보냈는데 안 읽힘 -> 실험을 다시 함<br>
+        잘못 안 읽힌다 -> primer 하나를 더 씀 -> 목록에서 하나 더 꺼냄<br>
+        두 실수의 비용이 다릅니다. 그래서 안전한 쪽으로 기울였습니다.<br><br>
+        <b>두 실수의 비용이 다르기 때문</b><br>
+        · 잘못 읽힌다 → 실험 재수행<br>
+        · 잘못 안 읽힌다 → primer 하나 더<br>
+        · 이 비대칭이 도구의 원칙<br>
+        [Q] 50/500으로? → 오늘 여쭐 항목<br>
+        <br>
+        조건에 걸린 건 어떻게 하는지.
+      </aside>
+    </section>
         <b>두 실수의 비용이 다르기 때문</b><br>
         · 잘못 읽힌다 → 실험 재수행<br>
         · 잘못 안 읽힌다 → primer 하나 더<br>
@@ -298,17 +356,27 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
     <!-- 10 -->
     <section>
       <h2>거르지 않고, 이유를 붙입니다</h2>
-      <pre style="font-size: 0.493em"><code class="language-plaintext" data-trim><script type="text/template">
-  1번 CLONE-F: 목표 중 500글자를 덮지 못함 / 목표 중 100글자가 읽히지 않는 구간에 걸림
-  2번 INS-F2: 목표 중 500글자를 덮지 못함 / 목표 중 100글자가 읽히지 않는 구간에 걸림
-  3번 INS-R1: 목표 중 500글자를 덮지 못함 / 목표 중 100글자가 읽히지 않는 구간에 걸림
-  4번 INS-F1: 목표 중 500글자를 덮지 못함 / 목표 중 10글자가 읽히지 않는 구간에 걸림
-              / 목표까지 91글자로 권장치(100)보다 가까움   ← 한 줄이 길어 접었습니다
-  5번 M13-F: 목표 중 640글자를 덮지 못함
-</script></code></pre>
-      <p style="font-size: 0.68em">조건에 걸려도 <strong>순위를 깎지 않습니다.</strong> 무엇에 걸렸는지만 적습니다.</p>
-      <p class="muted" style="font-size: 0.55em">랩에 primer가 몇 개 없으면, 빼는 순간 결과가 0개가 되기 때문입니다.</p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart LR
+  A[조건 미달 primer] --> B{제외 처리?}
+  B -- NO --> C[목록에 남기고<br>결격 사유만 표시]
+  C --> D[결과 0개 방지]
+  B -. YES .-> E[목록 삭제 시<br>결과 0개 위험]
+        </pre>
+      </div>
       <aside class="notes">
+        [터미널 원문 생략됨]<br>
+        조건에 걸려도 순위를 깎지 않습니다. 무엇에 걸렸는지만 적습니다.<br>
+        랩에 primer가 몇 개 없으면, 빼는 순간 결과가 0개가 되기 때문입니다.<br><br>
+        <b>조건에 걸려도 순위를 안 깎습니다</b><br>
+        · 무엇에 걸렸는지만 알려 줌<br>
+        · 빼면 결과가 0개가 될 수 있음<br>
+        · 판단 대신 판단할 재료를 줌<br>
+        <br>
+        이 원칙이 코드에서 어떻게 보이는지.
+      </aside>
+    </section>
         <b>조건에 걸려도 순위를 안 깎습니다</b><br>
         · 무엇에 걸렸는지만 알려 줌<br>
         · 빼면 결과가 0개가 될 수 있음<br>
@@ -322,32 +390,20 @@ primer 목록 7개 중 5개 추천, 1개 제외, 1개는 이 서열에 붙지 �
     <section>
       <section>
         <h2>결합을 찾을 때는 Tm으로 거르지 않습니다</h2>
-        <pre style="font-size: 0.412em"><code class="language-python" data-trim data-line-numbers="1-7|9-11|12-15|16-18|19"><script type="text/template">
-def find_bindings(
-    template: str,
-    primer: Primer,
-    *,
-    circular: bool,
-    anchor_len: int = DEFAULT_ANCHOR,
-) -> list[Binding]:
-    # (원본의 영어 설명글 7줄은 자리를 줄이려고 뺐습니다 — 내용은 아래 캡션)
-    size = len(template)
-    rc = revcomp(template)
-    out: list[Binding] = []
-    for strand, strand_seq in ((1, template), (-1, rc)):
-        for local_3p, annealed in find_sites(
-            strand_seq, primer.seq, circular=circular, anchor_len=anchor_len
-        ):
-            pos = local_3p if strand == 1 else size - 1 - local_3p
-            tm = primer3.calc_tm(primer.seq[-annealed:])
-            out.append(Binding(primer, strand, pos, annealed, tm))
-    return out
-</script></code></pre>
-        <p class="muted" style="font-size: 0.5em">
-          검색 중에 Tm으로 거르면 진짜 두 번째 결합 자리가 사라집니다. 그러면 "한 곳에만 붙는다"고 잘못 보고하게 됩니다.<br>
-          13글자를 세는 일 자체는 여기서 부르는 <code>find_sites</code>가 합니다.
-        </p>
+        <div class="figure" style="margin-top: 1em;">
+          <pre class="mermaid">
+flowchart TD
+    A[탐색 시작] --> B[정/역방향 탐색]
+    B --> C[3' 끝 13글자 일치 확인]
+    C --> D[결합 부위 길이 계산]
+    D --> E[Tm 값 계산]
+    E --> F[결과 목록에 추가<br>Tm 값으로 탈락시키지 않음]
+          </pre>
+        </div>
         <aside class="notes">
+          [Python 소스코드 원문 생략됨]<br>
+          검색 중에 Tm으로 거르면 진짜 두 번째 결합 자리가 사라집니다. 그러면 "한 곳에만 붙는다"고 잘못 보고하게 됩니다.<br>
+          13글자를 세는 일 자체는 여기서 부르는 <code>find_sites</code>가 합니다.<br><br>
           <b>탐색 단계에서는 아무것도 안 거릅니다</b><br>
           · 거르면 두 번째 자리가 사라짐<br>
           · 한 곳에만 붙는다고 오보하게 됨<br>
@@ -398,21 +454,28 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 12 -->
     <section class="slow-one">
       <h2>파일 다섯 개, 역할이 겹치지 않습니다</h2>
-      <table style="font-size: 0.60em">
-        <thead><tr><th>파일</th><th>하는 일</th><th>계층</th></tr></thead>
-        <tbody>
-          <tr><td>core.py</td><td>primer 하나 — 어디 붙고, 뭘 읽고, 몇 등인지</td><td>계산</td></tr>
-          <tr><td>coverage.py</td><td>여러 개를 합쳐 — 어느 조합을 쓰고 뭐가 남는지</td><td>계산</td></tr>
-          <tr><td>design.py</td><td>재고로 못 읽는 구간에 쓸 새 primer 설계</td><td>계산</td></tr>
-          <tr><td>readers.py</td><td>SnapGene 파일과 CSV 읽기</td><td>입출력</td></tr>
-          <tr><td>cli.py</td><td>옵션 해석과 화면 출력</td><td>화면</td></tr>
-        </tbody>
-      </table>
-      <p class="rise" style="--i:0;font-size: 0.62em; margin-top: 0.4em">
-        계산 세 파일에는 화면 출력이 <strong>한 줄도 없습니다.</strong> 웹 화면을 붙일 때 <code>cli.py</code>만 갈아 끼우면 됩니다.
-      </p>
-      <p class="cite">소스 1,849줄 · 테스트 1,293줄 · 설계 문서 1,522줄</p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart LR
+    A[입출력<br>readers.py] --> B[계산 계층]
+    B --> C[화면 출력<br>cli.py]
+    subgraph B [화면 출력 없음]
+      direction TB
+      D[core.py: 1개 단위 계산]
+      E[coverage.py: 조합 계산]
+      F[design.py: 새 primer 설계]
+    end
+        </pre>
+      </div>
+      <p class="cite" style="margin-top: 0.8em">소스 1,849줄 · 테스트 1,293줄 · 설계 문서 1,522줄</p>
       <aside class="notes">
+        [원문]<br>
+        core.py: primer 하나 — 어디 붙고, 뭘 읽고, 몇 등인지<br>
+        coverage.py: 여러 개를 합쳐 — 어느 조합을 쓰고 뭐가 남는지<br>
+        design.py: 재고로 못 읽는 구간에 쓸 새 primer 설계<br>
+        readers.py: SnapGene 파일과 CSV 읽기<br>
+        cli.py: 옵션 해석과 화면 출력<br>
+        계산 세 파일에는 화면 출력이 한 줄도 없습니다. 웹 화면을 붙일 때 cli.py만 갈아 끼우면 됩니다.<br><br>
         <b>주장이 아니라 확인한 사실입니다</b><br>
         · 계산 세 파일에 화면 출력 0건<br>
         · 처음부터 웹 붙일 걸 알고 나눔<br>
@@ -426,41 +489,22 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 13 -->
     <section>
       <h2>탈락 개수가 거짓말하지 않게</h2>
-      <p class="muted" style="font-size: 0.48em; margin-bottom: 0.3em">
-        값싼 검사는 하나가 걸려도 끝까지 셉니다. 그래야 화면의 탈락 개수가 진짜 숫자가 됩니다.
-      </p>
-      <pre style="font-size: 0.342em"><code class="language-python" data-trim data-line-numbers="1-3|5-8|10-13|15-18|20-22|24-25"><script type="text/template">
-    if set(seq) - set("ACGT"):
-        rejected["bases"] = rejected.get("bases", 0) + 1
-        return None  # nothing else can be measured on an undetermined sequence
-
-    failed = False
-    if not criteria.min_length <= len(seq) <= criteria.max_length:
-        rejected["length"] = rejected.get("length", 0) + 1
-        failed = True
-
-    tm = primer3.calc_tm(seq)
-    if not criteria.min_tm <= tm <= criteria.max_tm:
-        rejected["tm"] = rejected.get("tm", 0) + 1
-        failed = True
-
-    gc = 100 * (seq.count("G") + seq.count("C")) / len(seq)
-    if not criteria.min_gc <= gc <= criteria.max_gc:
-        rejected["gc"] = rejected.get("gc", 0) + 1
-        failed = True
-
-    if longest_run(seq) > criteria.max_poly_run:
-        rejected["poly"] = rejected.get("poly", 0) + 1
-        failed = True
-
-    if failed:
-        return None
-</script></code></pre>
-      <p class="muted" style="font-size: 0.43em">
-        첫 조건만 예외 — 글자가 안 정해졌으면 나머지를 잴 수 없어 바로 멈춥니다.<br>
-        구조·특이성 검사 둘은 이 뒤에 오고, 그쪽은 걸리면 즉시 멈춥니다. 그래서 그 개수는 <strong>여기를 통과한 것 중에서만</strong> 센 숫자입니다.
-      </p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart TD
+  A[글자 확정 여부] -- 미정 --> B[즉시 중단]
+  A -- 확정 --> C{값싼 검사 4종 진행}
+  C --> D[길이 검사] & E[Tm 검사] & F[GC 비율 검사] & G[연속 문자 검사]
+  D & E & F & G --> H{하나라도 탈락?}
+  H -- YES --> I[결격 개수에 모두 누적 후 탈락]
+  H -- NO --> J[비싼 검사 진입<br>구조/특이성]
+        </pre>
+      </div>
       <aside class="notes">
+        [Python 소스코드 원문 생략됨]<br>
+        값싼 검사는 하나가 걸려도 끝까지 셉니다. 그래야 화면의 탈락 개수가 진짜 숫자가 됩니다.<br>
+        첫 조건만 예외 — 글자가 안 정해졌으면 나머지를 잴 수 없어 바로 멈춥니다.<br>
+        구조·특이성 검사 둘은 이 뒤에 오고, 그쪽은 걸리면 즉시 멈춥니다. 그래서 그 개수는 여기를 통과한 것 중에서만 센 숫자입니다.<br><br>
         <b>처음엔 첫 조건에서 바로 멈췄습니다</b><br>
         · 화면은 GC 30개, 실제는 174개<br>
         · 넓히면 회수한다가 거짓말이 됨<br>
@@ -474,14 +518,23 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 14 -->
     <section class="slow-steps">
       <h2>어떻게 검증했나</h2>
-      <div style="font-size: 0.66em">
-        <p>고리 모양 서열에서 <strong>역방향 primer 제안이 전부 틀렸습니다.</strong></p>
-        <p class="rise" style="--i:0">그때 테스트 111개가 전부 통과하고 있었습니다. <span class="muted">(당시 개수)</span></p>
-        <p class="rise" style="--i:1">원인 — 산술이 산술을 검증했을 뿐, <strong>서열을 한 번도 확인하지 않았습니다.</strong></p>
-        <p class="rise" style="--i:2">검증 방식을 바꿨습니다. 툴이 뱉은 답을 서열에서 되짚어 다시 찾게 했습니다.</p>
-        <p class="rise" style="--i:3">그러자 제안 90개 중 <strong>26개가 실패</strong>로 드러났습니다.</p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+sequenceDiagram
+    participant Test as 수학적 테스트 (111개 통과)
+    participant Seq as 실제 서열 검증
+    Test->>Test: 산술 값끼리 검증<br>(고리 역방향 제안 전량 오류)
+    Test->>Seq: 검증 방식 변경<br>(도출된 답을 서열에서 역검색)
+    Seq-->>Test: 제안 90개 중 26개 실패 적발
+        </pre>
       </div>
       <aside class="notes">
+        [원문]<br>
+        고리 모양 서열에서 역방향 primer 제안이 전부 틀렸습니다.<br>
+        그때 테스트 111개가 전부 통과하고 있었습니다. (당시 개수)<br>
+        원인 — 산술이 산술을 검증했을 뿐, 서열을 한 번도 확인하지 않았습니다.<br>
+        검증 방식을 바꿨습니다. 툴이 뱉은 답을 서열에서 되짚어 다시 찾게 했습니다.<br>
+        그러자 제안 90개 중 26개가 실패로 드러났습니다.<br><br>
         <b>테스트가 다 통과하는데 틀려 있었습니다</b><br>
         · 고리 서열 역방향 제안 전량 오류<br>
         · plasmid는 전부 고리<br>
@@ -495,28 +548,25 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 15 -->
     <section>
       <h2>지금 검증 상태</h2>
-      <div class="cols">
-        <div>
-          <h3 style="font-size: 0.68em">두껍게 검증된 것</h3>
-          <ul style="font-size: 0.6em">
-            <li>고리 좌표 계산</li>
-            <li>이음매 판정</li>
-            <li>덮임 계산과 막대 그리기</li>
-            <li>입력 파일 오류 처리</li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="font-size: 0.68em">검증되지 않은 것</h3>
-          <ul style="font-size: 0.6em">
-            <li>녹는점 값의 정확성</li>
-            <li>판정 기준의 실험적 타당성</li>
-            <li>SnapGene 실물 파일</li>
-          </ul>
-        </div>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((검증 상태))
+    두껍게 검증된 것
+      고리 좌표 계산
+      이음매 판정
+      덮임 계산과 막대 그리기
+      입력 파일 오류 처리
+    검증되지 않은 것
+      녹는점 값의 정확성
+      판정 기준의 실험적 타당성
+      SnapGene 실물 파일
+        </pre>
       </div>
       <p style="font-size: 0.72em; margin-top: 0.6em">테스트 <strong>149개</strong> 통과, 2.6초.</p>
-      <p class="muted" style="font-size: 0.55em">좌표는 검증했고, 판정 기준은 문헌 근거만 있습니다. 이 구분을 분명히 하겠습니다.</p>
       <aside class="notes">
+        [원문 생략됨]<br>
+        좌표는 검증했고, 판정 기준은 문헌 근거만 있습니다. 이 구분을 분명히 하겠습니다.<br><br>
         <b>검증했다를 두 갈래로 나눠 말합니다</b><br>
         · 좌표 계산은 두껍게 검증<br>
         · 녹는점 값은 확인한 적 없음<br>
@@ -532,16 +582,26 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 16 -->
     <section>
       <h2>아직 못 미더운 것 <span class="muted" style="font-size: 0.5em">(1/2)</span></h2>
-      <p class="muted" style="font-size: 0.52em; margin-top: -0.3em">찾아내시기 전에 먼저 말씀드립니다.</p>
-      <ol style="font-size: 0.52em; text-align: left; margin-top: 0.5em">
-        <li><strong>결합 판정 하한 40도</strong> — 시퀀싱 반응 온도는 50도입니다. 10도 낮습니다.
-          <span class="muted">40도는 "여기 붙는다"를 찾는 하한이지 "써도 된다"는 기준이 아닙니다. 이 둘을 섞어 쓰고 있습니다.</span></li>
-        <li><strong>판정이 경계에서 뒤집힙니다</strong> — GC 46%인 13글자의 Tm이 40.5도입니다.
-          <span class="muted">하한 40도와 거의 같은 자리라, 서열 성질에 따라 다중결합 판정이 뒤집힐 수 있습니다.</span></li>
-        <li><strong>낙관 설정에 논리 구멍</strong> — 낙관이 버리는 길이 150이 보수의 100보다 <em>깁니다</em>.
-          <span class="muted">그래서 100~150 구간이 낙관에서만 안 읽힙니다. 150의 출처도 업체가 아니라 다른 도구 기본값입니다.</span></li>
-      </ol>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((미해결 이슈))
+    결합 판정 하한 40도
+      실제 반응 온도는 50도
+      탐지 기준과 사용 기준의 혼재
+    경계값의 불안정성
+      GC 46% 13글자가 40.5도
+      서열 미세 차이로 판정 뒤집힘
+    낙관 설정의 논리 구멍
+      버리는 길이 150 > 보수의 100
+      출처 부족
+        </pre>
+      </div>
       <aside class="notes">
+        [원문 생략됨]<br>
+        1. 결합 판정 하한 40도 — 시퀀싱 반응 온도는 50도입니다. 10도 낮습니다. 40도는 "여기 붙는다"를 찾는 하한이지 "써도 된다"는 기준이 아닙니다.<br>
+        2. 판정이 경계에서 뒤집힙니다 — GC 46%인 13글자의 Tm이 40.5도입니다. 하한 40도와 거의 같은 자리라, 서열 성질에 따라 다중결합 판정이 뒤집힐 수 있습니다.<br>
+        3. 낙관 설정에 논리 구멍 — 낙관이 버리는 길이 150이 보수의 100보다 깁니다. 150의 출처도 업체가 아니라 다른 도구 기본값입니다.<br><br>
         <b>셋째는 이번에 처음 찾았습니다</b><br>
         · 40도 — 반응 온도보다 10도 낮음<br>
         · 40.5도 — 하한과 거의 같은 자리<br>
@@ -555,24 +615,26 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 17 -->
     <section>
       <h2>아직 못 미더운 것 <span class="muted" style="font-size: 0.5em">(2/2)</span></h2>
-      <ol start="4" style="font-size: 0.6em; text-align: left; margin-top: 0.6em">
-        <li><strong>SnapGene 실물 파일 미검증</strong> — 실물 <code>.dna</code>가 없어 한 번도 못 돌려 봤습니다.</li>
-        <li><strong>열역학 검증 0건</strong> — 테스트가 좌표만 봅니다. 녹는점이 맞는지 확인한 적이 없습니다.</li>
-      </ol>
-      <div style="font-size: 0.56em; margin-top: 0.8em">
-        <p style="margin-bottom: 0.3em"><strong>숫자를 흔들어 봤습니다</strong> — 이 예시 데이터에서</p>
-        <table>
-          <thead><tr><th>바꾼 값</th><th>결과</th></tr></thead>
-          <tbody>
-            <tr><td>결합 길이 13 → 10, 16, 20</td><td>변화 없음</td></tr>
-            <tr><td>Tm 하한 40 → 50</td><td>변화 없음</td></tr>
-            <tr><td>Tm 하한 40 → 60</td><td>추천 3개, 덮임 82%</td></tr>
-            <tr><td>판독 설정을 중간(50/500)으로</td><td>빈 구간과 설계 제안이 통째로 사라짐</td></tr>
-          </tbody>
-        </table>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((미해결 &<br>민감도))
+    검증 공백
+      SnapGene 실물 파일 부재
+      열역학(Tm) 검증 0건
+    설정 민감도 (예시)
+      결합 길이 변경: 변화 없음
+      Tm 40 → 50: 변화 없음
+      Tm 40 → 60: 덮임 82% 하락
+      판독 50/500 변경: 빈 구간 소멸
+        </pre>
       </div>
-      <p class="muted" style="font-size: 0.52em">결과를 실제로 바꾸는 건 판독 설정 하나뿐이었습니다.</p>
       <aside class="notes">
+        [원문 생략됨]<br>
+        4. SnapGene 실물 파일 미검증<br>
+        5. 열역학 검증 0건<br>
+        숫자를 흔들어 봤습니다: 결합길이는 변화없음, Tm 하한 50은 변화없음, Tm 60은 덮임 하락, 판독 설정 중간시 빈 구간 증발<br>
+        결과를 실제로 바꾸는 건 판독 설정 하나뿐이었습니다.<br><br>
         <b>13과 40은 이 데이터에서 무력했습니다</b><br>
         · 앵커 10·16·20 모두 결과 동일<br>
         · 하한 50까지 동일, 60에서 변화<br>
@@ -589,20 +651,20 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
       <!-- 18 -->
       <section class="slow-one">
         <h2>이미 있는 도구로는 안 되나</h2>
-        <table style="font-size: 0.58em">
-          <thead><tr><th>도구</th><th>하는 것</th><th>안 하는 것</th></tr></thead>
-          <tbody>
-            <tr><td>Primer3</td><td>새 primer 설계, 구간 나눠 읽기 설계</td><td>보유 목록에서 고르기</td></tr>
-            <tr><td>SnapGene</td><td>primer가 어디 붙는지 표시</td><td>조합 계산, 덮임 최적화</td></tr>
-            <tr><td>Benchling</td><td>primer 목록 관리, 결합 자리 탐지</td><td>목표 구간을 덮는 조합 고르기</td></tr>
-            <tr><td>Geneious Prime</td><td>보유 primer 테스트 + 구간 나눠 읽기 설계</td><td><strong>둘을 합친 최소 조합 계산</strong></td></tr>
-          </tbody>
-        </table>
-        <p class="rise" style="--i:0;font-size: 0.68em; margin-top: 0.6em">
-          Geneious가 가장 가깝습니다. 두 기능을 <em>각각</em> 줍니다. 합쳐서 "재고 N개 중 최소 조합"은 안 줍니다.
-        </p>
-        <p class="muted" style="font-size: 0.52em">적용 범위는 plasmid 규모입니다. 더 긴 서열에서는 느려집니다 (아래 부록).</p>
+        <div class="figure" style="margin-top: 1em;">
+          <pre class="mermaid">
+flowchart LR
+    A(기존 도구의 한계) --> B[Primer3: 설계만 함]
+    A --> C[SnapGene: 결합 위치만 표시]
+    A --> D[Benchling: 목록과 결합 자리 관리]
+    A --> E[Geneious Prime: 설계와 테스트 제공]
+    E -. 그러나 .-> F[전체 기능 융합 불가:<br>보유 재고 중 최소 조합 골라주지 않음]
+          </pre>
+        </div>
+        <p class="muted" style="font-size: 0.52em; margin-top: 1em;">적용 범위는 plasmid 규모입니다. 더 긴 서열에서는 느려집니다 (아래 부록).</p>
         <aside class="notes">
+          [원문 비교표 생략됨]<br>
+          Geneious가 가장 가깝습니다. 두 기능을 각각 줍니다. 합쳐서 "재고 N개 중 최소 조합"은 안 줍니다.<br><br>
           <b>Geneious가 가깝지만 둘을 안 합칩니다</b><br>
           · 재고 테스트와 tiling을 각각 제공<br>
           · 최소 조합은 사람이 손으로<br>
@@ -662,13 +724,22 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 19 -->
     <section class="hero">
       <h1>여쭙고 싶은 것 네 가지</h1>
-      <ol style="font-size: 0.68em; text-align: left; margin-top: 1em">
-        <li class="rise" style="--i:0">판정 기준이 실험적으로 타당한가</li>
-        <li class="rise" style="--i:1">다음에 무엇을 만들지 우선순위</li>
-        <li class="rise" style="--i:2">프로젝트 범위가 맞는가</li>
-        <li class="rise" style="--i:3">실제 랩 운영에 붙일 수 있는가</li>
-      </ol>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((논의 사항))
+    판정 기준 타당성
+    차기 개발 우선순위
+    프로젝트 범위의 적합성
+    실제 랩 운영 적용
+        </pre>
+      </div>
       <aside class="notes">
+        [원문]<br>
+        1. 판정 기준이 실험적으로 타당한가<br>
+        2. 다음에 무엇을 만들지 우선순위<br>
+        3. 프로젝트 범위가 맞는가<br>
+        4. 실제 랩 운영에 붙일 수 있는가<br><br>
         <b>여기서부터가 오늘의 본론입니다</b><br>
         · 앞의 내용은 전부 판단 재료였음<br>
         · 넷 다 제가 혼자 못 정하는 것<br>
@@ -680,14 +751,26 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 20 -->
     <section>
       <h2>논의 ① 판정 기준이 타당한가</h2>
-      <ul style="font-size: 0.68em">
-        <li><strong>40도를 올려야 할까요?</strong> 반응 온도가 50도인데 탐지 하한이 40도입니다.
-          <span class="muted">탐지 하한은 40으로 두고, "쓰기엔 약하다"는 경고선을 따로 둘 수도 있습니다.</span></li>
-        <li class="rise" style="--i:0"><strong>13글자가 맞을까요?</strong> UCSC In-Silico PCR은 15, 문헌 권고 하한은 10입니다.</li>
-        <li class="rise" style="--i:1"><strong>기본을 100/400에서 50/500으로 옮길까요?</strong> 후자가 외부 표준과 일치합니다.</li>
-        <li class="rise" style="--i:2"><strong>낙관 설정 150은 고칠까요?</strong> 논리 구멍이 있고 출처도 약합니다.</li>
-      </ul>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((판정 기준))
+    하한 40도
+      반응 온도(50도)보다 낮음
+    13글자 길이
+      UCSC 15, 문헌 10과 차이
+    100/400 판독
+      표준(50/500)으로의 회귀 검토
+    150 낙관 설정
+      출처 및 논리적 허점
+        </pre>
+      </div>
       <aside class="notes">
+        [원문]<br>
+        40도를 올려야 할까요? 반응 온도가 50도인데 탐지 하한이 40도입니다.<br>
+        13글자가 맞을까요? UCSC In-Silico PCR은 15, 문헌 권고 하한은 10입니다.<br>
+        기본을 100/400에서 50/500으로 옮길까요? 후자가 외부 표준과 일치합니다.<br>
+        낙관 설정 150은 고칠까요? 논리 구멍이 있고 출처도 약합니다.<br><br>
         <b>논점은 기본값을 어디 둘지입니다</b><br>
         · 40도를 올릴지, 선을 나눌지<br>
         · 13글자 — UCSC 15, 문헌 하한 10<br>
@@ -702,18 +785,25 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <section>
       <section>
         <h2>논의 ② 다음에 무엇을 만들까</h2>
-        <table style="font-size: 0.62em">
-          <thead><tr><th>후보</th><th>왜 필요한가</th></tr></thead>
-          <tbody>
-            <tr><td>웹 화면</td><td>지금은 터미널 명령뿐. 랩원이 쓰려면 화면이 필요</td></tr>
-            <tr><td>SnapGene 실물 파일 검증</td><td>유일하게 남은 큰 미검증 영역</td></tr>
-            <tr><td>덮임 그림을 파일로 저장</td><td>실험 노트에 붙이거나 공유하려면</td></tr>
-            <tr><td>설계한 primer를 목록에 자동 기록</td><td>지금은 화면에만 나오고 직접 적어야 함</td></tr>
-          </tbody>
-        </table>
-        <p class="rise" style="--i:0;font-size: 0.68em; margin-top: 0.6em">어느 것부터 할까요? 아니면 여기 없는 것이 더 급할까요?</p>
-        <p class="muted" style="font-size: 0.52em">일부러 안 만든 것들은 아래 부록에 있습니다.</p>
+        <div class="figure" style="margin-top: 1em;">
+          <pre class="mermaid">
+mindmap
+  root((개발 후보))
+    웹 화면
+      랩원 사용성 증대
+    SnapGene 검증
+      핵심 미검증 영역 해결
+    덮임 그림 파일 저장
+      노트 및 공유 용이
+    목록 자동 기록
+      수기 작성 자동화
+          </pre>
+        </div>
+        <p class="muted" style="font-size: 0.52em; margin-top: 1em;">일부러 안 만든 것들은 아래 부록에 있습니다.</p>
         <aside class="notes">
+          [원문 비교표 생략됨]<br>
+          웹 화면, SnapGene 검증, 덮임 그림 저장, 자동 기록 4가지가 후보입니다.<br>
+          어느 것부터 할까요? 아니면 여기 없는 것이 더 급할까요?<br><br>
           <b>웹 화면이 1순위지만 확정은 아닙니다</b><br>
           · 화면 코드만 새로 붙이면 됨<br>
           · SnapGene은 파일 하나면 바로<br>
@@ -749,17 +839,22 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 22 -->
     <section class="slow-steps">
       <h2>논의 ③ 프로젝트 범위가 맞는가</h2>
-      <div style="font-size: 0.7em">
-        <p>전체 plasmid를 <strong>한 번에 읽는 방식</strong>이 샘플당 15달러까지 내려왔습니다.</p>
-        <p class="rise" style="--i:0;margin-top: 0.5em">그러면 여러 primer로 나눠 읽는 일이 계속 있을까요?</p>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart TD
+    A[단가 하락: 전체 plasmid를 한 번에<br>읽는 비용 $15] --> B{효용성 유지?}
+    B -- 부분 확인 --> C[Sanger가 여전히 저렴/신속]
+    B -- 신규 설계 --> D[새 primer 설계 기능의 가치 재평가]
+        </pre>
       </div>
-      <ul class="rise" style="--i:1;font-size: 0.6em; margin-top: 0.8em">
-        <li>특정 구간만 확인하는 데는 Sanger가 여전히 싸고 빠릅니다</li>
-        <li>다만 <strong>새 primer 설계 기능</strong>의 가치는 달라질 수 있습니다</li>
-        <li>이 질문은 설계 문서에 미해소로 적어 두고 아직 못 풀었습니다</li>
-      </ul>
-      <p class="muted" style="font-size: 0.52em">실험 예산과 계획을 보시는 분만 답할 수 있는 질문이라 여쭙습니다.</p>
+      <p class="muted" style="font-size: 0.52em; margin-top: 1em;">실험 예산과 계획을 보시는 분만 답할 수 있는 질문이라 여쭙습니다.</p>
       <aside class="notes">
+        [원문]<br>
+        전체 plasmid를 한 번에 읽는 방식이 샘플당 15달러까지 내려왔습니다.<br>
+        그러면 여러 primer로 나눠 읽는 일이 계속 있을까요?<br>
+        특정 구간만 확인하는 데는 Sanger가 여전히 싸고 빠릅니다.<br>
+        다만 새 primer 설계 기능의 가치는 달라질 수 있습니다.<br>
+        이 질문은 설계 문서에 미해소로 적어 두고 아직 못 풀었습니다.<br><br>
         <b>이 질문은 존재 이유를 흔듭니다</b><br>
         · 그래서 정면으로 여쭙습니다<br>
         · 구간 확인엔 Sanger가 여전히 유리<br>
@@ -773,17 +868,23 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 23 -->
     <section>
       <h2>논의 ④ 랩 운영에 붙일 수 있는가</h2>
-      <ul style="font-size: 0.68em">
-        <li class="rise" style="--i:0"><strong>이미 정리된 primer 목록이 있습니까?</strong>
-          <span class="muted">있다면 열 이름이 무엇인가요. 열 이름은 옵션으로 맞출 수 있습니다.</span></li>
-        <li class="rise" style="--i:1"><strong>그 목록 파일을 어디에 둘까요?</strong>
-          <span class="muted">지금은 각자 컴퓨터 기준입니다. 공유 위치가 정해지면 안내를 바꾸겠습니다.</span></li>
-        <li class="rise" style="--i:2"><strong>시퀀싱은 어느 업체에 맡깁니까?</strong>
-          <span class="muted">업체별 판독 구간 프리셋을 채우려면 알아야 합니다.</span></li>
-        <li class="rise" style="--i:3"><strong>SnapGene 실물 파일을 하나 주실 수 있을까요?</strong>
-          <span class="muted">유일하게 남은 미검증 영역을 오늘 닫을 수 있습니다.</span></li>
-      </ul>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((랩 운영 도입))
+    기존 목록 유무
+      열 이름 맞춤화
+    목록 보관 위치
+      공유 위치 지정
+    시퀀싱 업체
+      판독 구간 프리셋 확인
+    SnapGene 실물
+      검증 영역 보완
+        </pre>
+      </div>
       <aside class="notes">
+        [원문 생략됨]<br>
+        이미 정리된 primer 목록 유무, 목록 파일 보관 위치, 주 이용 시퀀싱 업체, SnapGene 실물 파일 샘플 요구에 대한 질문들입니다.<br><br>
         <b>넷 다 실물 데이터가 있어야 답이 납니다</b><br>
         · 목록이 있으면 열 이름만 알려 주시면<br>
         · 공유 위치가 정해지면 안내 수정<br>
@@ -797,17 +898,23 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
     <!-- 24 -->
     <section class="hero">
       <h1>정리</h1>
-      <ul style="font-size: 0.6em; text-align: left; margin-top: 0.8em">
-        <li>랩 재고에서 시퀀싱 primer를 골라 주는 도구를 만들었습니다</li>
-        <li>판정 기준 네 개 중 둘은 외부 표준과 일치하고, 둘은 아직 약합니다</li>
-        <li>좌표 계산은 검증했고 열역학은 문헌 근거만 있습니다</li>
-        <li>다음은 웹 화면이 1순위이지만, 우선순위를 여쭙습니다</li>
-      </ul>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+flowchart LR
+    A[도구 구현 완료:<br>랩 재고 기반<br>자동 추천] --> B[검증 & 미검증:<br>좌표 계산 검증 완료<br>열역학은 문헌 근거]
+    B --> C[차기 과제:<br>웹 화면 도입 1순위<br>추가 우선순위 논의 요망]
+        </pre>
+      </div>
       <p class="muted" style="font-size: 0.5em; margin-top: 1.2em">
         조작법 — <strong>S</strong> 발표자 노트 · <strong>F</strong> 전체 화면 · <strong>ESC</strong> 전체 보기 ·
         <strong>B</strong> 화면 끄기 · <strong>?</strong> 단축키 · 주소 뒤 <strong>?print-pdf</strong> 인쇄 · <strong>?light</strong> 밝은 화면
       </p>
       <aside class="notes">
+        [원문 생략됨]<br>
+        랩 재고에서 시퀀싱 primer를 골라 주는 도구를 만들었습니다.<br>
+        판정 기준 네 개 중 둘은 외부 표준과 일치하고, 둘은 아직 약합니다.<br>
+        좌표 계산은 검증했고 열역학은 문헌 근거만 있습니다.<br>
+        다음은 웹 화면이 1순위이지만, 우선순위를 여쭙습니다.<br><br>
         <b>오늘 말씀을 네 줄로 정리했습니다</b><br>
         · 판정 기준 넷 중 둘은 표준과 일치<br>
         · 좌표는 검증, 열역학은 문헌만<br>

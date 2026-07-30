@@ -33,17 +33,30 @@
     <!-- 2. 목차 -->
     <section>
       <h2>오늘 볼 것</h2>
-      <ol>
-        <li class="fragment">수식 (LaTeX)</li>
-        <li class="fragment">코드와 강조</li>
-        <li class="fragment">다이어그램 (Mermaid)</li>
-        <li class="fragment">그래프 (Chart.js)</li>
-        <li class="fragment">표·출처·부록</li>
-      </ol>
-      <p class="muted" style="font-size: 0.6em; margin-top: 1.5em;">
-        한 항목씩 나타나는 것을 단계 표시(fragment)라고 합니다.
-      </p>
-      <aside class="notes">스페이스를 누를 때마다 한 줄씩 나타납니다.</aside>
+      <div class="figure" style="margin-top: 1em;">
+        <pre class="mermaid">
+mindmap
+  root((데모 요소))
+    수식 LaTeX
+    코드와 강조
+    다이어그램 Mermaid
+    그래프 Chart.js
+    기타
+      표
+      출처
+      부록
+        </pre>
+      </div>
+      <aside class="notes">
+        [원문 생략됨]<br>
+        1. 수식 (LaTeX)<br>
+        2. 코드와 강조<br>
+        3. 다이어그램 (Mermaid)<br>
+        4. 그래프 (Chart.js)<br>
+        5. 표·출처·부록<br>
+        한 항목씩 나타나는 것을 단계 표시(fragment)라고 합니다.<br>
+        스페이스를 누를 때마다 한 줄씩 나타납니다.
+      </aside>
     </section>
 
     <!-- 3. 섹션 구분 -->
@@ -153,36 +166,56 @@ flowchart LR
     <!-- 9. 표 -->
     <section>
       <h2>표와 출처</h2>
-      <table>
-        <thead>
-          <tr><th>시료</th><th>열전도도 (W/mK)</th><th>측정 온도 (K)</th><th>비고</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>구리</td><td>401</td><td>300</td><td>기준 시료</td></tr>
-          <tr><td>알루미늄</td><td>237</td><td>300</td><td>—</td></tr>
-          <tr><td>스테인리스 304</td><td>16.2</td><td>300</td><td>재측정 필요</td></tr>
-          <tr><td>공기</td><td>0.026</td><td>300</td><td>1 기압</td></tr>
-        </tbody>
-      </table>
+      <div class="figure" style="margin-top: 1em;">
+        <canvas id="demo-bar-chart" width="900" height="400" role="img"
+                aria-label="구리, 알루미늄, 스테인리스, 공기의 열전도도 비교 막대그래프"></canvas>
+      </div>
       <span class="cite">값은 예시입니다. 실제 발표에서는 출처를 이 자리에 적으세요.</span>
+      <aside class="notes">
+        [원문 표 데이터]<br>
+        구리: 401 W/mK (기준 시료)<br>
+        알루미늄: 237 W/mK<br>
+        스테인리스 304: 16.2 W/mK (재측정 필요)<br>
+        공기: 0.026 W/mK (1 기압)
+      </aside>
     </section>
 
     <!-- 10. 수직 슬라이드 — 부록/증명을 아래로 숨긴다 -->
     <section>
       <section>
         <h2>부록은 아래로 넣습니다</h2>
-        <p class="lead rise" style="--i:0">아래 방향키를 누르면 유도 과정이 나옵니다.</p>
-        <p class="muted" style="font-size: 0.6em;">
-          발표 중에는 건너뛰고, 질문이 나오면 내려가면 됩니다.
-        </p>
-        <aside class="notes">질문 대비용 슬라이드를 본류에서 감추는 방법입니다.</aside>
+        <div class="figure" style="margin-top: 1em;">
+          <pre class="mermaid">
+flowchart TD
+  A[본 발표 흐름] --> B[질문 발생 시 하향 이동]
+  B -.-> C[부록/증명 슬라이드 표출]
+  C -.-> A
+          </pre>
+        </div>
+        <p class="muted" style="font-size: 0.6em; margin-top: 1.5em;">아래 방향키를 누르면 유도 과정이 나옵니다.</p>
+        <aside class="notes">
+          [원문]<br>
+          아래 방향키를 누르면 유도 과정이 나옵니다.<br>
+          발표 중에는 건너뛰고, 질문이 나오면 내려가면 됩니다.<br>
+          질문 대비용 슬라이드를 본류에서 감추는 방법입니다.
+        </aside>
       </section>
       <section>
         <h2>유도 과정</h2>
-        <p class="rise" style="--i:0">정상 상태에서 발열이 없다면 열 방정식은 라플라스 방정식이 됩니다.</p>
-        $$ \frac{\partial T}{\partial t} = \alpha \nabla^{2} T
-           \;\xrightarrow{\;\partial T/\partial t = 0\;}\; \nabla^{2} T = 0 $$
-        <p class="muted" style="font-size: 0.6em;">위 방향키로 돌아갑니다.</p>
+        <div class="figure" style="margin-top: 1em;">
+          <pre class="mermaid">
+flowchart TD
+  A[열 방정식<br>∂T/∂t = α∇²T] --> B{정상 상태 & 발열 없음?}
+  B -- Yes --> C[∂T/∂t = 0 대입]
+  C --> D[라플라스 방정식<br>∇²T = 0]
+          </pre>
+        </div>
+        <p class="muted" style="font-size: 0.6em; margin-top: 1.5em;">위 방향키로 돌아갑니다.</p>
+        <aside class="notes">
+          [원문]<br>
+          정상 상태에서 발열이 없다면 열 방정식은 라플라스 방정식이 됩니다.<br>
+          수식 생략.
+        </aside>
       </section>
     </section>
 
@@ -329,7 +362,9 @@ flowchart LR
 
   function renderChart() {
     var el = document.getElementById('demo-chart');
-    if (!el || typeof Chart === 'undefined') return;
+    var elBar = document.getElementById('demo-bar-chart');
+    if (!el && !elBar) return;
+    if (typeof Chart === 'undefined') return;
     
     var muted = getCssVar('--g-muted', '#B8BFD0');
     var accent = getCssVar('--g-accent', '#A088FF');
@@ -339,45 +374,84 @@ flowchart LR
     Chart.defaults.color = muted;
     Chart.defaults.font.family = '"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif';
     Chart.defaults.font.size = 15;
-    new Chart(el, {
-      type: 'line',
-      data: {
-        labels: [0, 10, 20, 30, 40, 50, 60],
-        datasets: [
-          {
-            label: '시료 A',
-            data: [300, 312, 325, 334, 340, 343, 344],
-            borderColor: accent,
-            backgroundColor: 'rgba(160, 136, 255, 0.15)',
-            tension: 0.3,
-            fill: true
-          },
-          {
-            label: '시료 B',
-            data: [300, 306, 313, 319, 324, 328, 331],
-            borderColor: amber,
-            backgroundColor: 'rgba(255, 212, 107, 0.12)',
-            tension: 0.3,
-            fill: true
-          }
-        ]
-      },
-      options: {
-        responsive: false,
-        animation: (isReceiver || isPrint || reduceMotion) ? false : { duration: 600 },
-        plugins: { legend: { labels: { boxWidth: 12 } } },
-        scales: {
-          x: {
-            title: { display: true, text: '시간 (s)' },
-            grid: { color: border }
-          },
-          y: {
-            title: { display: true, text: '온도 (K)' },
-            grid: { color: border }
+    
+    if (el) {
+      new Chart(el, {
+        type: 'line',
+        data: {
+          labels: [0, 10, 20, 30, 40, 50, 60],
+          datasets: [
+            {
+              label: '시료 A',
+              data: [300, 312, 325, 334, 340, 343, 344],
+              borderColor: accent,
+              backgroundColor: 'rgba(160, 136, 255, 0.15)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: '시료 B',
+              data: [300, 306, 313, 319, 324, 328, 331],
+              borderColor: amber,
+              backgroundColor: 'rgba(255, 212, 107, 0.12)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: false,
+          animation: (isReceiver || isPrint || reduceMotion) ? false : { duration: 600 },
+          plugins: { legend: { labels: { boxWidth: 12 } } },
+          scales: {
+            x: {
+              title: { display: true, text: '시간 (s)' },
+              grid: { color: border }
+            },
+            y: {
+              title: { display: true, text: '온도 (K)' },
+              grid: { color: border }
+            }
           }
         }
-      }
-    });
+      });
+    }
+
+    if (elBar) {
+      new Chart(elBar, {
+        type: 'bar',
+        data: {
+          labels: ['구리', '알루미늄', '스테인리스 304', '공기'],
+          datasets: [{
+            label: '열전도도 (W/mK)',
+            data: [401, 237, 16.2, 0.026],
+            backgroundColor: [
+              'rgba(160, 136, 255, 0.6)',
+              'rgba(160, 136, 255, 0.6)',
+              'rgba(255, 212, 107, 0.6)',
+              'rgba(184, 191, 208, 0.4)'
+            ],
+            borderColor: [accent, accent, amber, muted],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: false,
+          animation: (isReceiver || isPrint || reduceMotion) ? false : { duration: 600 },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              grid: { color: border }
+            },
+            y: {
+              title: { display: true, text: '열전도도 (W/mK)' },
+              grid: { color: border },
+              type: 'logarithmic'
+            }
+          }
+        }
+      });
+    }
   }
 })();
 </script>
