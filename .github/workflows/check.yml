@@ -30,15 +30,12 @@ jobs:
 
       - name: 문법 검사
         run: |
-          node --check assets/starfield.js
-          node --check assets/starfield.selftest.js
+          node --check assets/absci-bg.js
           node --check assets/flow.js
           node --check assets/flow.selftest.js
           node --check .github/check-links.js
           node --check .github/check-render.js
 
-      - name: 별 애니메이션 자체 검사
-        run: node assets/starfield.selftest.js
 
       - name: 도식 조작 자체 검사
         run: node assets/flow.selftest.js

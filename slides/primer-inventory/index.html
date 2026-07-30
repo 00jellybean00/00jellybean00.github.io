@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -828,13 +828,8 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
 (function () {
   'use strict';
 
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // 발표자 화면은 이 페이지를 다시 불러온다. 거기서는 등장 애니메이션을 끈다.
-  // 안 끄면 발표자가 다음 내용을 확인하려는 순간 빈 화면부터 다시 본다.
-  if (new URLSearchParams(location.search).has('receiver')) {
-    document.documentElement.classList.add('no-anim');
-  }
+  var reduceMotion = window.absciTheme.reduceMotion;
+  var isReceiver = window.absciTheme.isReceiver;
 
   Reveal.initialize({
     // 참고 덱과 같은 화면 크기. 기준 글자 크기도 42에서 48로 함께 올렸다(위 style 블록).
@@ -872,7 +867,7 @@ def dead_zone_region(binding: Binding, *, dead_zone: int = DEFAULT_DEAD_ZONE) ->
 
   function alignTerminalBlocks() {
     // 발표자 화면은 이 페이지를 다시 불러온다. 거기서는 굳이 다시 재지 않는다.
-    if (new URLSearchParams(location.search).has('receiver')) return;
+    if (isReceiver) return;
     document.querySelectorAll('.reveal pre code').forEach(function (code) {
       try { alignOne(code); } catch (err) { console.warn('한 블록의 폭 보정을 건너뜁니다:', err); }
     });

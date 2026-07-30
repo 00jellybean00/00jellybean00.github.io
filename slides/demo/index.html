@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -213,14 +213,11 @@ flowchart LR
 (function () {
   'use strict';
 
-  // 발표자 화면은 이 페이지를 iframe으로 다시 불러온다. 거기서는 무거운 그리기를 건너뛴다.
-  var params = new URLSearchParams(location.search);
-  var isReceiver = params.has('receiver');
-  // 발표자 화면의 미리보기에서 등장 움직임이 다시 재생되면 안 된다.
-  // 발표자가 다음 내용을 확인하려는 순간 빈 화면부터 다시 보게 된다.
-  if (isReceiver) document.documentElement.classList.add('no-anim');
-  var isPrint = params.has('print-pdf');
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 발표자 화면, 인쇄 등 공통 환경 상태는 absci-bg.js 의 window.absciTheme을 사용한다.
+  var isReceiver = window.absciTheme.isReceiver;
+  var isPrint = window.absciTheme.isPrint;
+  var reduceMotion = window.absciTheme.reduceMotion;
+  var getCssVar = window.absciTheme.getCssVar;
 
   Reveal.initialize({
     // 화면 크기와 기준 글자 크기는 짝이다. 기준 글자 48 은 absci-reveal.css 에 있다.
@@ -277,40 +274,43 @@ flowchart LR
   }
 
   function drawMermaid(nodes) {
+    var bg = getCssVar('--g-bg', '#06080F');
+    var surface = getCssVar('--g-surface', '#0E1220');
+    var text = getCssVar('--g-text', '#E2E6F0');
+    var muted = getCssVar('--g-muted', '#B8BFD0');
+    var accent = getCssVar('--g-accent', '#A088FF');
+    var bg2 = getCssVar('--g-card-hover', '#161B30');
+
     mermaid.initialize({
       startOnLoad: false,
-      // 'base'라야 아래 색 지정이 온전히 먹는다. 'dark'는 자체 색을 덮어쓴다.
       theme: 'base',
       securityLevel: 'strict',
       flowchart: { htmlLabels: false, padding: 16, nodeSpacing: 51, rankSpacing: 63 },
       themeVariables: {
-        // 'inherit'로 두면 화면 밖 임시 칸과 슬라이드의 글꼴이 달라져
-        // 한글 상자 너비를 잘못 재고 글자가 잘린다. 실제 글꼴을 그대로 적는다.
         fontFamily: '"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", -apple-system, sans-serif',
         fontSize: '17px',
         background: 'transparent',
-        primaryColor: '#0E1220',
-        primaryTextColor: '#E2E6F0',
-        primaryBorderColor: '#A088FF',
-        secondaryColor: '#161B30',
-        secondaryTextColor: '#E2E6F0',
-        secondaryBorderColor: '#B8BFD0',
-        tertiaryColor: '#0E1220',
-        tertiaryTextColor: '#E2E6F0',
-        tertiaryBorderColor: '#B8BFD0',
-        lineColor: '#B8BFD0',
-        textColor: '#E2E6F0',
-        mainBkg: '#0E1220',
-        nodeBorder: '#A088FF',
-        edgeLabelBackground: '#06080F',
-        labelBackground: '#06080F',
+        primaryColor: surface,
+        primaryTextColor: text,
+        primaryBorderColor: accent,
+        secondaryColor: bg2,
+        secondaryTextColor: text,
+        secondaryBorderColor: muted,
+        tertiaryColor: surface,
+        tertiaryTextColor: text,
+        tertiaryBorderColor: muted,
+        lineColor: muted,
+        textColor: text,
+        mainBkg: surface,
+        nodeBorder: accent,
+        edgeLabelBackground: bg,
+        labelBackground: bg,
         clusterBkg: 'transparent',
-        clusterBorder: '#B8BFD0'
+        clusterBorder: muted
       }
     });
 
     var jobs = Array.prototype.map.call(nodes, function (el, i) {
-      // 하나가 실패해도 나머지 다이어그램은 그려져야 한다.
       return mermaid.render('mmd-' + i, dedent(el.textContent))
         .then(function (out) { el.innerHTML = out.svg; })
         .catch(function (err) {
@@ -321,7 +321,6 @@ flowchart LR
     return Promise.all(jobs).then(function () { Reveal.layout(); });
   }
 
-  // HTML 들여쓰기가 그대로 딸려 오면 mermaid가 문법 오류로 본다.
   function dedent(text) {
     var lines = text.replace(/\t/g, '  ').split('\n').filter(function (l) { return l.trim(); });
     var indent = Math.min.apply(null, lines.map(function (l) { return l.match(/^ */)[0].length; }));
@@ -331,9 +330,13 @@ flowchart LR
   function renderChart() {
     var el = document.getElementById('demo-chart');
     if (!el || typeof Chart === 'undefined') return;
-    Chart.defaults.color = '#B8BFD0';
-    // 캔버스는 'inherit'을 글꼴 이름으로 받지 못한다. 그대로 두면 조용히 무시되고
-    // 기본값 10px sans-serif로 그려진다. 실제 글꼴 이름을 적어야 한다.
+    
+    var muted = getCssVar('--g-muted', '#B8BFD0');
+    var accent = getCssVar('--g-accent', '#A088FF');
+    var amber = getCssVar('--g-amber', '#FFD46B');
+    var border = getCssVar('--g-border', 'rgba(160, 136, 255, 0.28)');
+    
+    Chart.defaults.color = muted;
     Chart.defaults.font.family = '"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif';
     Chart.defaults.font.size = 15;
     new Chart(el, {
@@ -344,7 +347,7 @@ flowchart LR
           {
             label: '시료 A',
             data: [300, 312, 325, 334, 340, 343, 344],
-            borderColor: '#A088FF',
+            borderColor: accent,
             backgroundColor: 'rgba(160, 136, 255, 0.15)',
             tension: 0.3,
             fill: true
@@ -352,7 +355,7 @@ flowchart LR
           {
             label: '시료 B',
             data: [300, 306, 313, 319, 324, 328, 331],
-            borderColor: '#FFD46B',
+            borderColor: amber,
             backgroundColor: 'rgba(255, 212, 107, 0.12)',
             tension: 0.3,
             fill: true
@@ -360,19 +363,17 @@ flowchart LR
         ]
       },
       options: {
-        // reveal이 슬라이드를 확대·축소하므로 자동 크기 조정을 끈다. 켜면 크기가 계속 흔들린다.
         responsive: false,
-        // 인쇄 모드에서 애니메이션이 남아 있으면 그리는 도중에 PDF로 찍힐 수 있다.
         animation: (isReceiver || isPrint || reduceMotion) ? false : { duration: 600 },
         plugins: { legend: { labels: { boxWidth: 12 } } },
         scales: {
           x: {
             title: { display: true, text: '시간 (s)' },
-            grid: { color: 'rgba(226, 230, 240, 0.1)' }
+            grid: { color: border }
           },
           y: {
             title: { display: true, text: '온도 (K)' },
-            grid: { color: 'rgba(226, 230, 240, 0.1)' }
+            grid: { color: border }
           }
         }
       }

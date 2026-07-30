@@ -55,14 +55,13 @@
 :root.light { background-image: none; }
 :root.light #starfield { display: none; }
 
-/* 성운(nebula)은 html 배경에 직접 얹는다. opacity가 낮아 눈에 띄지 않는다.
-   별 캔버스보다 뒤에 있어야 하므로 가상 요소 대신 배경 이미지로 둔다. */
+/* 성운(nebula)이나 별 대신 엡사이(Absci) 브랜드의 짙은 보라/청록색 그라디언트를 배경으로 사용합니다.
+   대비비(AA 4.5:1 이상)를 넉넉히 만족시키기 위해 바탕을 매우 어둡게(투명도를 낮춰) 고정합니다. */
 html {
   background-color: var(--g-bg);
   background-image:
-    radial-gradient(60% 45% at 22% 18%, rgba(160, 136, 255, 0.07), transparent 70%),
-    radial-gradient(50% 40% at 80% 75%, rgba(43, 234, 208, 0.055), transparent 70%),
-    radial-gradient(45% 35% at 65% 25%, rgba(255, 122, 149, 0.035), transparent 70%);
+    radial-gradient(ellipse at top right, rgba(160, 136, 255, 0.12), transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(43, 234, 208, 0.08), transparent 50%);
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
@@ -73,46 +72,13 @@ body {
   margin: 0;
 }
 
-/* 별 캔버스는 항상 맨 뒤. 클릭을 가로채지 않는다. */
-#starfield {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  display: block;
-}
-
-/* 별 캔버스 위에 얹는 두 겹 — 색 얼룩과 옅은 격자.
-   CSS 만으로는 안 그려진다. 각 화면이 body 첫머리에 두 div 를 직접 놓아야 한다.
-   이름을 sky- 로 잡은 이유: deck- 은 이 파일에서 이미 랜딩의 발표자료 카드를 뜻한다. */
+/* 별 캔버스나 부가 렌더링 요소는 새 테마에서 사용하지 않습니다. 
+   과거 HTML 파일에 껍데기가 남아있을 수 있으므로 아예 감춥니다. */
+#starfield,
 .sky-glow,
 .sky-grid {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+  display: none !important;
 }
-.sky-glow {
-  background:
-    radial-gradient(circle at 15% 20%, rgba(160, 136, 255, 0.13), transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(43, 234, 208, 0.10), transparent 45%),
-    radial-gradient(circle at 50% 50%, rgba(255, 122, 149, 0.04), transparent 60%);
-  animation: skyDrift 18s ease-in-out infinite alternate;
-}
-@keyframes skyDrift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(-2%, 2%) scale(1.05); }
-}
-.sky-grid {
-  background-image:
-    linear-gradient(rgba(160, 136, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(160, 136, 255, 0.05) 1px, transparent 1px);
-  background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85), transparent 75%);
-          mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85), transparent 75%);
-}
-:root.light .sky-glow,
-:root.light .sky-grid { display: none; }
 
 /* ── 등장 움직임 ─────────────────────────────────────────────
    핵심: 처음 모습(opacity:0)을 @keyframes 의 from 에만 두고 fill-mode 를 backwards 로 준다.

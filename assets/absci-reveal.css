@@ -90,13 +90,26 @@
   color: var(--g-text);
 }
 
-/* 코드·다이어그램·그래프 상자는 밝은 화면에서도 어두운 채로 둔다.
-   반투명으로 두면 밝은 배경이 비쳐 회색이 되고, 그 안의 선과 글자가 안 보인다.
-   그래서 여기서는 불투명한 색을 쓴다. */
-:root.light .reveal pre,
-:root.light .reveal .figure {
+/* 코드 블록은 highlight.js 어두운 테마를 쓰므로 어둡게 둔다.
+   단, 전역 변수가 밝은 모드(어두운 글씨)로 바뀌면 배경과 충돌하므로
+   코드 블록 내부에서는 어두운 모드의 밝은 글씨 색상을 강제로 유지한다. */
+:root.light .reveal pre {
+  --g-text: #E2E6F0;
+  --g-muted: #B8BFD0;
+  --g-accent: #A088FF;
+  --g-link: #2BEAD0;
+  --g-pink: #FF7A95;
+  --g-amber: #FFD46B;
   background: var(--g-bg-2, #161B30);
   border-color: rgba(160, 136, 255, 0.32);
+}
+
+/* 다이어그램(mermaid)과 그래프(.figure)는 자바스크립트에서 밝은 모드 색상을 
+   동적으로 가져오도록 수정되었으므로 밝은 화면에서는 배경을 투명하게 푼다. */
+:root.light .reveal pre.mermaid,
+:root.light .reveal .figure {
+  background: transparent;
+  border-color: var(--g-border);
 }
 :root.light .reveal .figure .cite { color: var(--g-muted); }
 

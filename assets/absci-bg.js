@@ -1,2 +1,23 @@
-/* absci-bg.js: CSS ±â¹İ ¹è°æ ÀüÈ¯À¸·Î ÀÎÇØ ±âÁ¸ JS ·»´õ¸µ ·ÎÁ÷Àº Á¦°ÅµÇ¾ú½À´Ï´Ù. */
-(function() { 'use strict'; })();
+(function() {
+  'use strict';
+  // ê³µí†µ ìµœì í™”: URL íŒŒë¼ë¯¸í„° í™•ì¸ í›„ ìƒíƒœ í´ë˜ìŠ¤ ì¶”ê°€ ë° ë³€ìˆ˜ ë…¸ì¶œ
+  var params = new URLSearchParams(location.search);
+  var isReceiver = params.has('receiver');
+  var isPrint = params.has('print-pdf');
+  
+  if (isReceiver) {
+    document.documentElement.classList.add('no-anim');
+  }
+  
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  window.absciTheme = {
+    isReceiver: isReceiver,
+    isPrint: isPrint,
+    reduceMotion: reduceMotion,
+    getCssVar: function(name, fallback) {
+      var val = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return val || fallback;
+    }
+  };
+})();
